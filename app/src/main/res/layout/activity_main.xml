@@ -6,6 +6,7 @@
     android:padding="24dp"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
+    android:background="#BBDBC7"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
@@ -14,35 +15,57 @@
         android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight=".3">
+        android:layout_weight=".1">
 
-        <LinearLayout
-            android:gravity="center_horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <Button
-                android:id="@+id/btnConnect"
-                android:layout_width="wrap_content"
-                android:layout_margin="10dp"
-                android:layout_height="wrap_content"
-                android:text="Conectar con ESP32" />
-
-        </LinearLayout>
 
         <TextView
             android:id="@+id/tvData"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Esperando datos..."
             android:layout_marginTop="30dp"
-            android:textSize="18sp" />
+            android:text="Esperando conexión"
+            android:textSize="20sp" />
     </LinearLayout>
-
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/chart"
-        android:layout_margin="10dp"
+    <LinearLayout
+        android:background="@drawable/ic_graph_border"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight=".7"/>
+        android:layout_weight=".7"
+        android:orientation="vertical">
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/chart"
+            android:layout_margin="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight=".2"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnConnect"
+            android:layout_width="0dp"
+            android:layout_weight=".5"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:backgroundTint="#036666"
+            android:text="Conectar"
+            app:cornerRadius="15dp" />
+
+        <Button
+            android:id="@+id/btnStart"
+            android:layout_width="0dp"
+            android:layout_weight=".5"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:textColor="#edf6f9"
+            android:backgroundTint="#3a506b"
+            app:cornerRadius="15dp"
+            android:text="Realizar prueba"/>
+
+    </LinearLayout>
 </LinearLayout>
