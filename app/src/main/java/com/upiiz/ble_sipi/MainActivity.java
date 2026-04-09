@@ -56,11 +56,41 @@ public class MainActivity extends AppCompatActivity {
     private Button btnStart;
     Handler uiHandler = new Handler();
 
+    private Handler plotHandler = new Handler();
+    private Runnable plotRunnable;
+    private ArrayList<Float> pendingEmg = new ArrayList<>();
+    private ArrayList<Float> pendingDynamo = new ArrayList<>();
+    private static final int PLOT_INTERVAL_MS = 50; // actualizar gráfico cada 50 ms (20 fps)
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
+        plotRunnable = new Runnable() {
+            @Override
+            public void run() {
+                // Copiar los pendientes y limpiar
+                ArrayList<Float> emgCopy, dynamoCopy;
+                synchronized (pendingEmg) {
+                    if (pendingEmg.isEmpty()) {
+                        plotHandler.postDelayed(this, PLOT_INTERVAL_MS);
+                        return;
+                    }
+                    emgCopy = new ArrayList<>(pendingEmg);
+                    dynamoCopy = new ArrayList<>(pendingDynamo);
+                    pendingEmg.clear();
+                    pendingDynamo.clear();
+                }
+                // Dibujar todos los puntos acumulados
+                for (int i = 0; i < emgCopy.size(); i++) {
+                    plotSamples(emgCopy.get(i), dynamoCopy.get(i));
+                }
+                plotHandler.postDelayed(this, PLOT_INTERVAL_MS);
+            }
+        };
+        plotHandler.post(plotRunnable);
 
 
 
@@ -170,8 +200,12 @@ public class MainActivity extends AppCompatActivity {
             bleService = binder.getService();
             isBound = true;
 
-            bleService.setListener((emg, dynamo) ->
-                    runOnUiThread(() -> plotSamples(emg, dynamo)));
+            bleService.setListener((emg, dynamo) -> {
+                synchronized (pendingEmg) {
+                    pendingEmg.add(emg);
+                    pendingDynamo.add(dynamo);
+                }
+            });
 
             bleService.setOnConnectedListener(() -> {
                 runOnUiThread(() -> btnStart.setVisibility(View.VISIBLE));
@@ -182,6 +216,10 @@ public class MainActivity extends AppCompatActivity {
         public void onServiceDisconnected(ComponentName name) {
             isBound = false;
             btnStart.setVisibility(View.GONE);
+            synchronized (pendingEmg) {
+                pendingEmg.clear();
+                pendingDynamo.clear();
+            }
         }
 
     };
@@ -201,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
         x++;
 
 
-        if (emgSet.getEntryCount() > 100) {
+        if (emgSet.getEntryCount() > 500) {
             emgSet.removeFirst();
             dynamoSet.removeFirst();
         }
@@ -212,4 +250,13 @@ public class MainActivity extends AppCompatActivity {
         lineChart.invalidate();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        plotHandler.removeCallbacks(plotRunnable);
+        if (isBound) {
+            unbindService(connection);
+            isBound = false;
+        }
+    }
 }

@@ -63,6 +63,8 @@ public class AnalisisActivity extends AppCompatActivity {
     BLEService bleService;
     boolean isBound = false;
 
+
+
     private ServiceConnection connection = new ServiceConnection() {
 
         @Override
@@ -145,26 +147,18 @@ public class AnalisisActivity extends AppCompatActivity {
 
             @Override
             public void onFinish() {
-                txtTiempo.setText("0s");
-                txtEstado.setText(mensajeFin);
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(AnalisisActivity.this);
-                builder.setTitle("Resultado");
-                builder.setMessage("MAV: " + MAV(muestrasEMG) + "\n" +
-                                    "WL: " + WL(muestrasEMG) + "\n" +
-                                    "Order V: " + orderV(muestrasEMG) + "\n" +
-                                    "Dynamo MAV: " + MAV(muestrasDyn) + "\n"
-                        );
-
-                builder.setPositiveButton("OK", null);
-
-                AlertDialog dialog = builder.create();
-                dialog.show();
 
                 if (mensajeFin.contains("Descanso")) {
                     //iniciarDescanso();
                 //} else {
                     terminarTodo();
+
+                    Intent intent = new Intent(AnalisisActivity.this, ReportActivity.class);
+                    intent.putExtra("emg_MAV",MAV(muestrasEMG));
+                    intent.putExtra("emg_WL",WL(muestrasEMG));
+                    intent.putExtra("emg_OrderV",orderV(muestrasEMG));
+                    intent.putExtra("dyn_MAV",MAV(muestrasDyn));
+                    startActivity(intent);
                 }
             }
         };

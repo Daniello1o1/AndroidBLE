@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">ble_sipi</string>
+    <string-array name="gender_array">
+        <item>Masculino</item>
+        <item>Femenino</item>
+    </string-array>
 </resources>

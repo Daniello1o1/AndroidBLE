@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
 
@@ -37,6 +38,11 @@ public class BLEService extends Service {
     public ArrayList<Float> emgSamples = new ArrayList<>();
     public ArrayList<Float> dynamoSamples = new ArrayList<>();
 
+    private int totalMuestrasRecibidas = 0;
+    private long lastTime = 0;
+    private int packetCount = 0;
+    private long lastPacketLog = 0;
+
     public interface DataListener{
         void onDataReceived(float emg, float dynamo);
     }
@@ -55,6 +61,7 @@ public class BLEService extends Service {
     }
 
     private final IBinder binder = new LocalBinder();
+    private int lastExpectedIndex = -1;
 
     public class LocalBinder extends Binder {
         BLEService getService(){
@@ -188,23 +195,40 @@ public class BLEService extends Service {
             }
 
             gatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH);
+            gatt.requestMtu(256);
         }
-
+        @Override
+        public void onMtuChanged(BluetoothGatt gatt, int mtu, int status) {
+            Log.d("BLE_MTU", "MTU negociado: " + mtu + ", status: " + status);
+        }
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
-
             byte[] data = characteristic.getValue();
+            if (data == null || data.length < 4) return;
 
-            for(int i = 0; i + 3 < data.length; i += 4){
+            // Leer timestamp (primeros 4 bytes, big-endian)
+            int firstIndex = ((data[0] & 0xFF) << 24) |
+                    ((data[1] & 0xFF) << 16) |
+                    ((data[2] & 0xFF) << 8)  |
+                    (data[3] & 0xFF);
 
-                int rawEMG =
-                        ((data[i+1] & 0xFF) << 8) |
-                                (data[i] & 0xFF);
+            // Calcular cuántas muestras vienen en este paquete
+            int samples = (data.length - 4) / 4;  // cada muestra ocupa 4 bytes (2 EMG + 2 DIN)
+            if (samples == 0) return;
 
-                int rawDynamo =
-                        ((data[i+3] & 0xFF) << 8) |
-                                (data[i+2] & 0xFF);
+            // Detectar pérdidas
+            if (lastExpectedIndex != -1 && firstIndex != lastExpectedIndex) {
+                int lost = firstIndex - lastExpectedIndex;
+            }
+            // Actualizar el próximo índice esperado
+            lastExpectedIndex = firstIndex + samples;
+
+            // Procesar cada muestra
+            for (int i = 0; i < samples; i++) {
+                int offset = 4 + i * 4;
+                int rawEMG = ((data[offset] & 0xFF) << 8) | (data[offset + 1] & 0xFF);
+                int rawDynamo = ((data[offset + 2] & 0xFF) << 8) | (data[offset + 3] & 0xFF);
 
                 float emgVolt = (rawEMG * 3.3f) / 4095.0f;
                 float dynamoVolt = (rawDynamo * 3.3f) / 4095.0f;
@@ -212,9 +236,19 @@ public class BLEService extends Service {
                 emgSamples.add(emgVolt);
                 dynamoSamples.add(dynamoVolt);
 
-                if(listener != null){
+                if (listener != null) {
                     listener.onDataReceived(emgVolt, dynamoVolt);
                 }
+            }
+
+
+// dentro del bucle for de cada muestra:
+            packetCount++;
+            long now = System.currentTimeMillis();
+            if (now - lastPacketLog >= 1000) {
+                Log.d("BLE_STATS", "Paquetes/s: " + packetCount + ", Muestras/s: " + (packetCount * samples));
+                packetCount = 0;
+                lastPacketLog = now;
             }
         }
     };
