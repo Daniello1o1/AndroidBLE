@@ -24,4 +24,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "ble_sipi"
 include(":app")
- 
+include(":SensoresV1")
+include(":sensoresv2")

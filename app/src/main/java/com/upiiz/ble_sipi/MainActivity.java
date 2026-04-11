@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvData;
     private Button btnConnect;
     private Button btnStart;
+    private Button btnWearOS;
     Handler uiHandler = new Handler();
 
     private Handler plotHandler = new Handler();
@@ -123,6 +124,8 @@ public class MainActivity extends AppCompatActivity {
         btnConnect = findViewById(R.id.btnConnect);
         btnStart = findViewById(R.id.btnStart);
         btnStart.setVisibility(View.GONE);
+        //Reloj
+        btnWearOS = findViewById(R.id.btnWearOS);
 
         LineDataSet emgSet = new LineDataSet(new ArrayList<>(), "EMG ENV");
         emgSet.setColor(Color.RED);
@@ -189,7 +192,10 @@ public class MainActivity extends AppCompatActivity {
         btnStart.setOnClickListener(v -> {
             startActivity(new Intent(this, AnalisisActivity.class));
         });
-
+        //Reloj
+        btnWearOS.setOnClickListener(v -> {
+            startActivity(new Intent(this, WearDataActivity.class));
+        });
     }
     private ServiceConnection connection = new ServiceConnection() {
 

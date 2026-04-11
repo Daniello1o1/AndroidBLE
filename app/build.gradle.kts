@@ -1,6 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
-    id("com.google.gms.google-services")
+
 }
 
 android {
@@ -35,6 +35,7 @@ android {
 dependencies {
 
     implementation(libs.appcompat)
+    implementation("com.google.android.gms:play-services-wearable:19.0.0")
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)

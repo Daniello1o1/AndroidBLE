@@ -10,7 +10,9 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/SensoresV1" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/sensoresv2" />
           </set>
         </option>
       </GradleProjectSettings>
