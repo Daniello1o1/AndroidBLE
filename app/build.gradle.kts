@@ -44,5 +44,6 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     implementation(libs.mpandroidchart)
     implementation(platform("com.google.firebase:firebase-bom:34.11.0"))
+    implementation("com.github.wendykierp:JTransforms:3.1")
 
 }

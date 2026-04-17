@@ -101,8 +101,6 @@ public class AnalisisActivity extends AppCompatActivity {
         Intent intent = new Intent(this, BLEService.class);
         bindService(intent, connection, BIND_AUTO_CREATE);
 
-        muestrasEMG = new ArrayList<>();
-        muestrasDyn = new ArrayList<>();
         txtEstado = findViewById(R.id.txtEstado);
         txtTiempo = findViewById(R.id.txtTiempo);
         btnIniciar = findViewById(R.id.btnIniciar);
@@ -115,10 +113,13 @@ public class AnalisisActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v->finish());
     }
     private void iniciarPrueba() {
-        if (muestrasEMG != null)
+        if (muestrasEMG != null && muestrasDyn != null) {
             muestrasEMG.clear();
-        if (muestrasDyn != null)
             muestrasDyn.clear();
+        } else {
+            Log.e("Analisis", "muestrasEMG o muestrasDyn son NULL");
+            return;
+        }
         ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(
                 time_circle,
                 PropertyValuesHolder.ofFloat("scaleX", 1f, 2f, 1f),
@@ -132,9 +133,9 @@ public class AnalisisActivity extends AppCompatActivity {
 
         btnIniciar.setVisibility(View.GONE);
         txtEstado.setText("Realiza 10 repeticiones de flexión-extensión");
-        iniciarConteo(TIEMPO_PRUEBA, "Tiempo terminado. Descanso de 3 minutos...");
+        iniciarConteo(TIEMPO_PRUEBA);
     }
-    private void iniciarConteo(long tiempoMS, String mensajeFin) {
+    private void iniciarConteo(long tiempoMS) {
 
 
 
@@ -148,26 +149,28 @@ public class AnalisisActivity extends AppCompatActivity {
             @Override
             public void onFinish() {
 
-                if (mensajeFin.contains("Descanso")) {
-                    //iniciarDescanso();
-                //} else {
+
                     terminarTodo();
+                    List<Float> copiaEMG = new ArrayList<>(muestrasEMG);
+                    List<Float> copiaDyn = new ArrayList<>(muestrasDyn);
+                    float[] emgArray = new float[copiaEMG.size()];
+                    float[] dynArray = new float[copiaDyn.size()];
+
+                    for (int i = 0; i < copiaEMG.size(); i++) {
+                        emgArray[i] = copiaEMG.get(i);
+                    }
+                    for (int i = 0; i < copiaDyn.size(); i++) {
+                        dynArray[i] = copiaDyn.get(i);
+                    }
 
                     Intent intent = new Intent(AnalisisActivity.this, ReportActivity.class);
-                    intent.putExtra("emg_MAV",MAV(muestrasEMG));
-                    intent.putExtra("emg_WL",WL(muestrasEMG));
-                    intent.putExtra("emg_OrderV",orderV(muestrasEMG));
-                    intent.putExtra("dyn_MAV",MAV(muestrasDyn));
+                    intent.putExtra("emgMuestras",emgArray);
+                    intent.putExtra("dynMuestras",dynArray);
                     startActivity(intent);
-                }
             }
         };
 
         timer.start();
-    }
-
-    private void iniciarDescanso() {
-        iniciarConteo(TIEMPO_DESCANSO, "Descanso terminado. Prueba completa.");
     }
 
     private void terminarTodo() {
@@ -176,26 +179,5 @@ public class AnalisisActivity extends AppCompatActivity {
         txtEstado.setText("¡Listo! Puedes repetir la prueba.");
         Log.d("numMuestras", String.valueOf(muestrasEMG.size()));
     }
-    public float MAV(List<Float> muestras){
-        float suma = 0;
-        for(int i=0;i<muestras.size();i++){
-            suma += muestras.get(i);
-        }
-        return suma / muestras.size();
-    }
-    public float orderV(List<Float> muestras){
-        float suma = 0;
-        for(int i=0;i<muestras.size();i++){
-            suma += (float) Math.pow(muestras.get(i),2);
-        }
-        return (float) Math.sqrt(suma / muestras.size());
-    }
 
-    public float WL(List<Float> muestras){
-        float suma = 0;
-        for(int i=0;i<muestras.size()-1;i++){
-            suma += Math.abs(muestras.get(i+1) - muestras.get(i));
-        }
-        return suma;
-    }
 }

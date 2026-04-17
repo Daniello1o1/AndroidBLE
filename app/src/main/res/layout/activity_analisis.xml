@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:orientation="vertical"
-    android:background="#BBDBC7"
+    android:background="@color/back_green"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".AnalisisActivity">
@@ -13,11 +13,12 @@
         android:layout_height="0dp"
         android:layout_weight=".2">
         <TextView
+            style="@style/TEXT"
             android:padding="24dp"
             android:id="@+id/txtEstado"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Instrucciones:"
+            android:text="Pulse para iniciar la prueba"
             android:textSize="20sp"
             android:gravity="center_horizontal"
             android:layout_gravity="center"
@@ -66,17 +67,21 @@
         android:orientation="vertical">
         <Button
             android:id="@+id/btnIniciar"
+            style="@style/BUTTON"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Iniciar prueba"
             android:padding="16dp"
+            android:backgroundTint="@color/btn_green"
             android:textSize="18sp"/>
 
         <Button
             android:id="@+id/btnBack"
+            style="@style/BUTTON"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Regresar"
+            android:backgroundTint="@color/btn_gray"
             android:padding="16dp"
             android:textSize="18sp"/>
     </LinearLayout>

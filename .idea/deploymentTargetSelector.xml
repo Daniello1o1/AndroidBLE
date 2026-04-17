@@ -28,27 +28,14 @@
       </SelectionState>
       <SelectionState runConfigName="sensoresv2">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-04-11T00:43:45.874380100Z">
+        <DropdownSelection timestamp="2026-04-13T17:55:31.761144800Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=RFAX73HJ7EL" />
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=S4YLN7X8KFJZGYOJ" />
             </handle>
           </Target>
         </DropdownSelection>
-        <DialogSelection>
-          <targets>
-            <Target type="DEFAULT_BOOT">
-              <handle>
-                <DeviceId pluginId="PhysicalDevice" identifier="serial=RFAX73HJ7EL" />
-              </handle>
-            </Target>
-            <Target type="DEFAULT_BOOT">
-              <handle>
-                <DeviceId pluginId="PhysicalDevice" identifier="serial=SOAMEUEUFQEAGYXG" />
-              </handle>
-            </Target>
-          </targets>
-        </DialogSelection>
+        <DialogSelection />
       </SelectionState>
     </selectionStates>
   </component>

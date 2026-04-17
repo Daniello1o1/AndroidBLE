@@ -3,4 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="turqoise">#75DDDD</color>
+    <color name="btn_green">#036666</color>
+    <color name="btn_gray">#3a506b</color>
+    <color name="back_green">#BBDBC7</color>
 </resources>

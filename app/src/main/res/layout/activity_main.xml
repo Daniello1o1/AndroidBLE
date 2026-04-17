@@ -20,10 +20,11 @@
 
         <TextView
             android:id="@+id/tvData"
+            style="@style/TEXT"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
-            android:text="Esperando conexión"
+            android:text="Grafica EMG + Dinamometro"
             android:textSize="20sp" />
     </LinearLayout>
     <LinearLayout
@@ -47,23 +48,25 @@
         android:orientation="horizontal">
 
         <Button
+            style="@style/BUTTON"
             android:id="@+id/btnConnect"
             android:layout_width="0dp"
             android:layout_weight=".5"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:backgroundTint="#036666"
+            android:backgroundTint="@color/btn_green"
             android:text="Conectar"
             app:cornerRadius="15dp" />
 
         <Button
+            style="@style/BUTTON"
             android:id="@+id/btnStart"
             android:layout_width="0dp"
             android:layout_weight=".5"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:textColor="#edf6f9"
-            android:backgroundTint="#3a506b"
+            android:backgroundTint="@color/btn_gray"
             app:cornerRadius="15dp"
             android:text="Realizar prueba"/>
 
@@ -76,6 +79,7 @@
         android:orientation="horizontal">
 
         <Button
+            style="@style/BUTTON"
             android:id="@+id/btnWearOS"
             android:layout_width="0dp"
             android:layout_weight=".5"
