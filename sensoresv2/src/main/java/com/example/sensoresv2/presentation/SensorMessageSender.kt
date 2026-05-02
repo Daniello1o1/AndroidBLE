@@ -15,6 +15,7 @@ class SensorMessageSender(
     }
 
     suspend fun sendSensorData(
+        timestampMs: Long,
         accX: Float,
         accY: Float,
         accZ: Float,
@@ -39,6 +40,7 @@ class SensorMessageSender(
 
             val payload = buildString {
                 append("{")
+                append("\"timestamp\":$timestampMs,")
                 append("\"accX\":$accX,")
                 append("\"accY\":$accY,")
                 append("\"accZ\":$accZ,")

@@ -36,6 +36,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.delay
 import android.view.WindowManager
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() { //Pantalla Principal
 
@@ -89,68 +91,58 @@ fun SensorScreen(
     var hasRotationVector by remember { mutableStateOf(rotationVector != null) } //Si el reloj cuenta con orientación, se muestra
     val context = LocalContext.current
     val sender = remember { SensorMessageSender(context) }
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(200)
+    val scope = rememberCoroutineScope()
 
-            sender.sendSensorData(
-                accX = accX,
-                accY = accY,
-                accZ = accZ,
-                gyroX = gyroX,
-                gyroY = gyroY,
-                gyroZ = gyroZ,
-                pitch = pitch,
-                roll = roll,
-                yaw = yaw
-            )
-        }
-    }
+
     DisposableEffect(sensorManager, accelerometer, gyroscope, rotationVector) { //Esta parte se encarga de que los sensores solo estén muestreando cuando el programa está en pantalla
         val rotationMatrix = FloatArray(9)
         val orientationAngles = FloatArray(3)
 
-        val listener = object : SensorEventListener { //Es el escucha de los sensores
-            override fun onSensorChanged(event: SensorEvent) { //Cada que uno de los sensores envía datos, se llama esta función
+        val listener = object : SensorEventListener {
+
+            override fun onSensorChanged(event: SensorEvent) {
+                val timestampMs = event.timestamp / 1_000_000L
+
                 when (event.sensor.type) {
                     Sensor.TYPE_ACCELEROMETER -> {
-                        accX = event.values[0] //Acomoda los valores en su determinada posición del arreglo
+                        accX = event.values[0]
                         accY = event.values[1]
                         accZ = event.values[2]
+
+                        scope.launch {
+                            sender.sendSensorData(
+                                timestampMs = timestampMs,
+                                accX = accX, accY = accY, accZ = accZ,
+                                gyroX = gyroX, gyroY = gyroY, gyroZ = gyroZ,
+                                pitch = pitch, roll = roll, yaw = yaw
+                            )
+                        }
                     }
 
                     Sensor.TYPE_GYROSCOPE -> {
-                        gyroX = event.values[0] //Acomoda los valores en su determinada posición del arreglo
+                        gyroX = event.values[0]
                         gyroY = event.values[1]
                         gyroZ = event.values[2]
                     }
 
                     Sensor.TYPE_ROTATION_VECTOR -> {
-                        SensorManager.getRotationMatrixFromVector( //Convierte los datos del sensor en matriz de rotación
-                            rotationMatrix,
-                            event.values
-                        )
-                        SensorManager.getOrientation( //Convierte los datos del sensor en matriz de ángulos
-                            rotationMatrix,
-                            orientationAngles
-                        )
-
-                        yaw = radiansToDegrees(orientationAngles[0]) //Acomoda los valores en su determinada posición del arreglo
-                        pitch = radiansToDegrees(orientationAngles[1]) //Además de transformar los datos a grados
-                        roll = radiansToDegrees(orientationAngles[2])
+                        SensorManager.getRotationMatrixFromVector(rotationMatrix, event.values)
+                        SensorManager.getOrientation(rotationMatrix, orientationAngles)
+                        yaw   = radiansToDegrees(orientationAngles[0])
+                        pitch = radiansToDegrees(orientationAngles[1])
+                        roll  = radiansToDegrees(orientationAngles[2])
                     }
                 }
             }
 
-            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-            }
+            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
         }
 
         accelerometer?.let { //Solo lo registra si el sensor existe
             sensorManager.registerListener( //Empieza a escuchar este sensor, y se le da un delay para tener una frecuencia de datos moderada
                 listener,
                 it,
-                SensorManager.SENSOR_DELAY_UI
+                SensorManager.SENSOR_DELAY_FASTEST
             )
         }
 
@@ -158,7 +150,7 @@ fun SensorScreen(
             sensorManager.registerListener( //Empieza a escuchar este sensor, y se le da un delay para tener una frecuencia de datos moderada
                 listener,
                 it,
-                SensorManager.SENSOR_DELAY_UI
+                SensorManager.SENSOR_DELAY_FASTEST
             )
         }
 
@@ -166,7 +158,7 @@ fun SensorScreen(
             sensorManager.registerListener( //Empieza a escuchar este sensor, y se le da un delay para tener una frecuencia de datos moderada
                 listener,
                 it,
-                SensorManager.SENSOR_DELAY_UI
+                SensorManager.SENSOR_DELAY_FASTEST
             )
         }
 
