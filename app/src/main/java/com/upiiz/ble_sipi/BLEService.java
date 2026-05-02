@@ -15,12 +15,16 @@ import android.bluetooth.le.ScanResult;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 public class BLEService extends Service {
@@ -35,13 +39,12 @@ public class BLEService extends Service {
     private BluetoothGatt bluetoothGatt;
     private OnConnectedListener onConnectedListener;
 
-    public ArrayList<Float> emgSamples = new ArrayList<>();
-    public ArrayList<Float> dynamoSamples = new ArrayList<>();
+    public List<Float> emgSamples = Collections.synchronizedList(new ArrayList<>());
+    public List<Float> dynamoSamples = Collections.synchronizedList(new ArrayList<>());
 
-    private int totalMuestrasRecibidas = 0;
-    private long lastTime = 0;
     private int packetCount = 0;
     private long lastPacketLog = 0;
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     public interface DataListener{
         void onDataReceived(float emg, float dynamo);
@@ -220,6 +223,7 @@ public class BLEService extends Service {
             // Detectar pérdidas
             if (lastExpectedIndex != -1 && firstIndex != lastExpectedIndex) {
                 int lost = firstIndex - lastExpectedIndex;
+                Log.d("Package Losses: ", String.valueOf(lost));
             }
             // Actualizar el próximo índice esperado
             lastExpectedIndex = firstIndex + samples;
@@ -236,8 +240,11 @@ public class BLEService extends Service {
                 emgSamples.add(emgVolt);
                 dynamoSamples.add(dynamoVolt);
 
+                // Pasa al hilo principal de forma segura
+                final float emg = emgVolt;
+                final float dynamo = dynamoVolt;
                 if (listener != null) {
-                    listener.onDataReceived(emgVolt, dynamoVolt);
+                    mainHandler.post(() -> listener.onDataReceived(emg, dynamo));
                 }
             }
 

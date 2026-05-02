@@ -86,7 +86,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:backgroundTint="#036666"
-            android:text="Relojito"
+            android:text="Sensor Inercial"
             app:cornerRadius="15dp" />
 
 

@@ -105,7 +105,7 @@ public class ReportActivity extends AppCompatActivity {
         for(int i=0;i<muestras.size()-1;i++){
             suma += Math.abs(muestras.get(i+1) - muestras.get(i));
         }
-        return suma;
+        return suma/muestras.size();
     }
 
     private void configurarGrafico() {
