@@ -35,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.delay
+import android.view.WindowManager
 
 class MainActivity : ComponentActivity() { //Pantalla Principal
 
@@ -45,6 +46,8 @@ class MainActivity : ComponentActivity() { //Pantalla Principal
 
     override fun onCreate(savedInstanceState: Bundle?) { //Punto de inicio de la actividad (lo que se muestra en el reloj)
         super.onCreate(savedInstanceState)
+
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager //Obtiene acceso a todos los senores y los adapta para el formato correcto
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) //Pide acceso al acelerómetro si existe
