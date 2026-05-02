@@ -32,9 +32,7 @@ import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import kotlin.math.PI
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
-import kotlinx.coroutines.delay
 import android.view.WindowManager
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
