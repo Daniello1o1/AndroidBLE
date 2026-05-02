@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() { //Pantalla Principal
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager //Obtiene acceso a todos los senores y los adapta para el formato correcto
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager //Obtiene acceso a todos los senores y los adapta para el formato correcto
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) //Pide acceso al acelerómetro si existe
         gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE) //Igual xd
         rotationVector = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) //Igual xddd
