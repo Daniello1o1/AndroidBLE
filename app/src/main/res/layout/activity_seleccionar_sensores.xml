@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Views.SeleccionarSensoresActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:text="Seleccionar sensores"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"/>
+
+        <TextView
+            android:text="Elige los sensores que se usarán en esta prueba"
+            android:textSize="14sp"
+            android:textColor="#888888"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- Grupo ESP32 -->
+        <TextView
+            android:text="ESP32 — BLE"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#888888"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"/>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            xmlns:app="http://schemas.android.com/apk/res-auto">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <CheckBox
+                    android:id="@+id/cbEMG"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="EMG (electromiografía)"
+                    android:padding="8dp"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F0F0F0"/>
+
+                <CheckBox
+                    android:id="@+id/cbDinamometro"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Dinamómetro"
+                    android:padding="8dp"/>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Grupo Watch -->
+        <TextView
+            android:text="Smartwatch — Wear OS"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#888888"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"/>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            xmlns:app="http://schemas.android.com/apk/res-auto">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <CheckBox
+                    android:id="@+id/cbAcelerometro"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Acelerómetro"
+                    android:padding="8dp"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F0F0F0"/>
+
+                <CheckBox
+                    android:id="@+id/cbGiroscopio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Giroscopio"
+                    android:padding="8dp"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F0F0F0"/>
+
+                <CheckBox
+                    android:id="@+id/cbOrientacion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Orientación (pitch, roll, yaw)"
+                    android:padding="8dp"/>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Advertencia -->
+        <TextView
+            android:id="@+id/tvAdvertenciaSensores"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#E53935"
+            android:textSize="13sp"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Botón siguiente -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSiguiente"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Siguiente"/>
+
+    </LinearLayout>
+
+</ScrollView>

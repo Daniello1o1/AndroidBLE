@@ -1,8 +1,7 @@
-package com.upiiz.ble_sipi;
+package com.upiiz.ble_sipi.Views;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,6 +19,8 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.upiiz.ble_sipi.Tools.EMGFrequencyAnalyzer;
+import com.upiiz.ble_sipi.R;
 
 import java.util.ArrayList;
 import java.util.List;

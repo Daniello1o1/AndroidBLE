@@ -1,4 +1,4 @@
-package com.upiiz.ble_sipi;
+package com.upiiz.ble_sipi.BLE;
 
 import android.Manifest;
 import android.app.Service;
@@ -39,12 +39,9 @@ public class BLEService extends Service {
     private BluetoothGatt bluetoothGatt;
     private OnConnectedListener onConnectedListener;
 
-    public List<Float> emgSamples = Collections.synchronizedList(new ArrayList<>());
-    public List<Float> dynamoSamples = Collections.synchronizedList(new ArrayList<>());
 
     private int packetCount = 0;
     private long lastPacketLog = 0;
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     public interface DataListener{
         void onDataReceived(float emg, float dynamo);
@@ -67,7 +64,7 @@ public class BLEService extends Service {
     private int lastExpectedIndex = -1;
 
     public class LocalBinder extends Binder {
-        BLEService getService(){
+        public BLEService getService(){
             return BLEService.this;
         }
     }
@@ -207,6 +204,9 @@ public class BLEService extends Service {
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt,
                                             BluetoothGattCharacteristic characteristic) {
+
+            // Al inicio del método
+            Log.d("BLE_TIMING", "Paquete recibido en: " + System.currentTimeMillis());
             byte[] data = characteristic.getValue();
             if (data == null || data.length < 4) return;
 
@@ -237,14 +237,9 @@ public class BLEService extends Service {
                 float emgVolt = (rawEMG * 3.3f) / 4095.0f;
                 float dynamoVolt = (rawDynamo * 3.3f) / 4095.0f;
 
-                emgSamples.add(emgVolt);
-                dynamoSamples.add(dynamoVolt);
 
-                // Pasa al hilo principal de forma segura
-                final float emg = emgVolt;
-                final float dynamo = dynamoVolt;
                 if (listener != null) {
-                    mainHandler.post(() -> listener.onDataReceived(emg, dynamo));
+                    listener.onDataReceived(emgVolt, dynamoVolt);
                 }
             }
 

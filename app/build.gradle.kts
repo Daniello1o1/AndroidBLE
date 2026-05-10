@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
-
+    alias(libs.plugins.kotlin.android)
+    id("com.google.gms.google-services")  // <-- agregar esto
 }
 
 android {
@@ -39,11 +40,16 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+
+    // BOM primero
+    implementation(platform("com.google.firebase:firebase-bom:34.11.0"))
+    // Dependencias Firebase después — sin versión porque el BOM las maneja
+    implementation("com.google.firebase:firebase-firestore")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation(libs.mpandroidchart)
-    implementation(platform("com.google.firebase:firebase-bom:34.11.0"))
     implementation("com.github.wendykierp:JTransforms:3.1")
 
 }

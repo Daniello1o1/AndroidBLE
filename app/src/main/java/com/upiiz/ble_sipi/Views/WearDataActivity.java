@@ -1,4 +1,4 @@
-package com.upiiz.ble_sipi;
+package com.upiiz.ble_sipi.Views;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -9,6 +9,9 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+
+import com.upiiz.ble_sipi.BLE.DataLayerListenerService;
+import com.upiiz.ble_sipi.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;

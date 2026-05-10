@@ -1,42 +1,30 @@
-package com.upiiz.ble_sipi;
+package com.upiiz.ble_sipi.Views;
 
-import android.Manifest;
-import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
-import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCallback;
-import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattDescriptor;
-import android.bluetooth.BluetoothGattService;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.upiiz.ble_sipi.BLE.BLEService;
+import com.upiiz.ble_sipi.R;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class AnalisisActivity extends AppCompatActivity {
     private static final long TIEMPO_PRUEBA = 30 * 1000;
@@ -75,8 +63,8 @@ public class AnalisisActivity extends AppCompatActivity {
             isBound = true;
 
             // usar el mismo buffer de muestras del service
-            muestrasEMG = bleService.emgSamples;
-            muestrasDyn = bleService.dynamoSamples;
+            // muestrasEMG = bleService.emgSamples;
+            // muestrasDyn = bleService.dynamoSamples;
         }
 
         @Override

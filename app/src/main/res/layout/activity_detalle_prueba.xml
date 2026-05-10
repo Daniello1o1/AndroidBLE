@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5"
+    tools:context=".Views.DetallePruebaActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Nombre -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/layoutNombre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nombre de la prueba"
+            android:layout_marginBottom="12dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etNombre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:inputType="text"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Duración -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/layoutDuracion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Duración total (segundos)"
+            android:layout_marginBottom="12dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etDuracion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:inputType="number"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Switch fases -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Dividir en fases"
+                android:textSize="16sp"/>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switchFases"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"/>
+
+        </LinearLayout>
+
+        <!-- Fases -->
+        <LinearLayout
+            android:id="@+id/layoutFases"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:text="Fases"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:id="@+id/containerFases"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAgregarFase"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+ Agregar fase"
+                android:visibility="gone"
+                android:layout_marginTop="8dp"/>
+
+            <TextView
+                android:id="@+id/tvAdvertenciaFases"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="#E53935"
+                android:textSize="13sp"/>
+
+        </LinearLayout>
+
+        <!-- Sensores -->
+        <TextView
+            android:text="Sensores"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"/>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <CheckBox android:id="@+id/cbEMG"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="EMG"
+                    android:enabled="false"
+                    android:padding="8dp"/>
+
+                <CheckBox android:id="@+id/cbDinamometro"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Dinamómetro"
+                    android:enabled="false"
+                    android:padding="8dp"/>
+
+                <CheckBox android:id="@+id/cbAcelerometro"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Acelerómetro"
+                    android:enabled="false"
+                    android:padding="8dp"/>
+
+                <CheckBox android:id="@+id/cbGiroscopio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Giroscopio"
+                    android:enabled="false"
+                    android:padding="8dp"/>
+
+                <CheckBox android:id="@+id/cbOrientacion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Orientación"
+                    android:enabled="false"
+                    android:padding="8dp"/>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Botones acción -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnEjecutar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ejecutar prueba"
+            android:layout_marginBottom="8dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnHistorial"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ver historial"
+            android:layout_marginBottom="8dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnEditar"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Editar"
+                android:layout_marginEnd="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnGuardarCambios"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Guardar cambios"
+                android:visibility="gone"
+                android:layout_marginEnd="8dp"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnBorrar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Borrar"
+                app:backgroundTint="#E53935"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

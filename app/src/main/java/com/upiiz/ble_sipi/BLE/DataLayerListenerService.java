@@ -1,4 +1,4 @@
-package com.upiiz.ble_sipi;
+package com.upiiz.ble_sipi.BLE;
 
 import android.content.Intent;
 import android.util.Log;
