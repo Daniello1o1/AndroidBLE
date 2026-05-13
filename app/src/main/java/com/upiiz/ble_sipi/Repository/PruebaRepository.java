@@ -161,6 +161,7 @@ public class PruebaRepository {
     private Map<String, Object> ejecucionToMap(Ejecucion e) {
         Map<String, Object> map = new HashMap<>();
         map.put("duracionReal",    e.duracionReal);
+        map.put("pacienteId", e.pacienteId);
         map.put("totalMuestras",   e.totalMuestras);
         map.put("emgMAVTotal",     e.emgMAVTotal);
         map.put("emgWLTotal",      e.emgWLTotal);
@@ -183,6 +184,7 @@ public class PruebaRepository {
     private Ejecucion mapToEjecucion(String id, Map<String, Object> map) {
         Ejecucion e = new Ejecucion();
         e.id              = id;
+        e.pacienteId = (String) map.get("pacienteId");
         e.pruebaId        = (String)    map.get("pruebaId");
         e.fechaEjecucion = toLong(map.get("fechaEjecucion"));
         e.duracionReal    = toInt(map.get("duracionReal"));
@@ -209,6 +211,20 @@ public class PruebaRepository {
             }
         }
         return e;
+    }
+    public void obtenerEjecucionesPorPaciente(String pacienteId,
+                                              Callback<List<Ejecucion>> callback) {
+        db.collectionGroup("ejecuciones")
+                .whereEqualTo("pacienteId", pacienteId)
+                .orderBy("fechaEjecucion", Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    List<Ejecucion> lista = new ArrayList<>();
+                    snapshot.forEach(doc ->
+                            lista.add(mapToEjecucion(doc.getId(), doc.getData())));
+                    callback.onSuccess(lista);
+                })
+                .addOnFailureListener(callback::onError);
     }
 
     // ================= HELPERS =================

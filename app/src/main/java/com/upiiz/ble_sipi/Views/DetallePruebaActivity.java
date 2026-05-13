@@ -42,7 +42,7 @@ public class DetallePruebaActivity extends AppCompatActivity {
 
     // Botones
     private MaterialButton btnEditar, btnGuardarCambios, btnBorrar;
-    private MaterialButton btnEjecutar, btnHistorial, btnAgregarFase;
+    private MaterialButton btnHistorial, btnAgregarFase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +77,6 @@ public class DetallePruebaActivity extends AppCompatActivity {
         btnEditar           = findViewById(R.id.btnEditar);
         btnGuardarCambios   = findViewById(R.id.btnGuardarCambios);
         btnBorrar           = findViewById(R.id.btnBorrar);
-        btnEjecutar         = findViewById(R.id.btnEjecutar);
         btnHistorial        = findViewById(R.id.btnHistorial);
         btnAgregarFase      = findViewById(R.id.btnAgregarFase);
     }
@@ -121,12 +120,6 @@ public class DetallePruebaActivity extends AppCompatActivity {
         btnGuardarCambios.setOnClickListener(v -> guardarCambios());
 
         btnBorrar.setOnClickListener(v -> confirmarBorrado());
-
-        btnEjecutar.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ConectarDispositivosActivity.class);
-            intent.putExtra("config", prueba);
-            startActivity(intent);
-        });
 
         btnHistorial.setOnClickListener(v -> {
             Intent intent = new Intent(this, HistorialActivity.class);

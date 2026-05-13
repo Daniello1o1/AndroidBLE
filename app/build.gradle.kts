@@ -45,6 +45,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:34.11.0"))
     // Dependencias Firebase después — sin versión porque el BOM las maneja
     implementation("com.google.firebase:firebase-firestore")
+    implementation(libs.firebase.auth)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

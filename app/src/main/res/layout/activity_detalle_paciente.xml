@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Views.DetallePacienteActivity"
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:background="@android:color/white">
+
+        <!-- Avatar inicial -->
+        <TextView
+            android:id="@+id/tvInicial"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:gravity="center"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:background="@drawable/circle_green"
+            android:layout_marginEnd="16dp"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvNombreCompleto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/tvInfoBasica"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textColor="#888888"/>
+
+        </LinearLayout>
+
+
+        <!-- Borrar -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnBorrar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Borrar"
+            app:backgroundTint="#E53935"/>
+
+
+    </LinearLayout>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnEjecutarPrueba"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ejecutar prueba"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"/>
+
+
+    <!-- Acordeones -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Sección 1: Datos generales -->
+            <include android:id="@+id/seccionDatos"
+                layout="@layout/layout_seccion_acordeon"/>
+
+            <!-- Sección 2: Perfil clínico -->
+            <include android:id="@+id/seccionPerfil"
+                layout="@layout/layout_seccion_acordeon"/>
+
+            <!-- Sección 3: Antecedentes personales -->
+            <include android:id="@+id/seccionAntPersonales"
+                layout="@layout/layout_seccion_acordeon"/>
+
+            <!-- Sección 4: Antecedentes familiares -->
+            <include android:id="@+id/seccionAntFamiliares"
+                layout="@layout/layout_seccion_acordeon"/>
+
+            <!-- Sección 5: Medicamentos -->
+            <include android:id="@+id/seccionMedicamentos"
+                layout="@layout/layout_seccion_acordeon"/>
+
+            <!-- Sección 6: Lesiones previas -->
+            <include android:id="@+id/seccionLesiones"
+                layout="@layout/layout_seccion_acordeon"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

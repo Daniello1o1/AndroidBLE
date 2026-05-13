@@ -172,12 +172,7 @@
         </com.google.android.material.card.MaterialCardView>
 
         <!-- Botones acción -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnEjecutar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Ejecutar prueba"
-            android:layout_marginBottom="8dp"/>
+
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnHistorial"

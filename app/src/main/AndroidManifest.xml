@@ -14,6 +14,7 @@
         android:required="true" />
 
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -21,8 +22,28 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:name=".MyApplication"
         android:theme="@style/Theme.Ble_sipi">
+        <activity
+            android:name=".Views.RegistroUsuarioActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Views.LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Views.MenuPrincipalActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Views.SeleccionarPruebaActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Views.DetallePacienteActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Views.RegistrarPacienteActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Views.ListaPacientesActivity"
+            android:exported="false" />
         <activity
             android:name=".Views.ResumenHistorialActivity"
             android:exported="false" />
@@ -33,7 +54,7 @@
             android:name=".Views.DetallePruebaActivity"
             android:exported="false" />
         <activity
-            android:name=".Views.MainActivity"
+            android:name=".Views.ListaPruebasActivity"
             android:exported="false" />
         <activity
             android:name=".Views.ResumenPruebaActivity"
@@ -55,12 +76,6 @@
             android:exported="false" />
         <activity
             android:name=".Views.ReportActivity"
-            android:exported="false" />
-        <activity
-            android:name=".SinTerminar.UserInfoActivity"
-            android:exported="false" />
-        <activity
-            android:name=".SinTerminar.UsersActivity"
             android:exported="false" />
 
         <service android:name=".BLE.BLEService" />
@@ -84,7 +99,7 @@
             android:name=".Views.AnalisisActivity"
             android:exported="false" />
         <activity
-            android:name=".Views.ListaPruebasActivity"
+            android:name=".Views.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

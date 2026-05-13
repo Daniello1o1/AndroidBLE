@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:text="Hábitos"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#888888"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"/>
+
+    <CheckBox android:id="@+id/cbFuma"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Fuma"
+        android:padding="8dp"/>
+
+    <CheckBox android:id="@+id/cbAlcohol"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Consume alcohol"
+        android:padding="8dp"/>
+
+    <CheckBox android:id="@+id/cbDrogas"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Consume drogas"
+        android:padding="8dp"/>
+
+    <CheckBox android:id="@+id/cbAlimentacionSaludable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Alimentación saludable"
+        android:padding="8dp"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tipo de ejercicio que practica"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etTipoEjercicio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:text="Condiciones clínicas"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#888888"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"/>
+
+    <CheckBox android:id="@+id/cbAntecedentes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tiene antecedentes de enfermedades"
+        android:padding="8dp"/>
+
+    <CheckBox android:id="@+id/cbSarcopenia"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sarcopenia"
+        android:padding="8dp"/>
+
+    <CheckBox android:id="@+id/cbDebilidadMuscular"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Debilidad muscular crónica"
+        android:padding="8dp"/>
+
+    <CheckBox android:id="@+id/cbDeficitB12"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Déficit de vitamina B12"
+        android:padding="8dp"/>
+
+    <CheckBox android:id="@+id/cbDeficitD"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Déficit de vitamina D"
+        android:padding="8dp"/>
+
+    <CheckBox android:id="@+id/cbRehabilitacion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Participa en rehabilitación"
+        android:padding="8dp"/>
+
+    <CheckBox android:id="@+id/cbDisartria"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Disartria"
+        android:padding="8dp"/>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutTipDisartria"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tipo de disartria"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="12dp"
+        android:visibility="gone"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etTipDisartria"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Observaciones clínicas"
+        android:layout_marginTop="8dp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etObservacionesClinicas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine"
+            android:minLines="3"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+</LinearLayout>

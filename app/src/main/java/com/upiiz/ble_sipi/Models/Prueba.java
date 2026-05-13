@@ -9,6 +9,7 @@ public class Prueba implements Serializable {
 
     public String id;                       // ID del documento en Firestore
     public String nombre;
+    public String pacienteId;
     public int duracionTotalSegundos;
     public boolean tieneIntervalos;
     public List<FasePrueba> fases;

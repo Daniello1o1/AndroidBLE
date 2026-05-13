@@ -7,6 +7,7 @@ import java.util.Map;
 public class Ejecucion implements Serializable {
 
     public String id;
+    public String pacienteId;
     public String pruebaId;
     public long fechaEjecucion;
     public int duracionReal;
