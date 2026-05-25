@@ -33,6 +33,7 @@ import com.upiiz.ble_sipi.BLE.BLEService;
 import com.upiiz.ble_sipi.BLE.DataLayerListenerService;
 import com.upiiz.ble_sipi.Models.FasePrueba;
 import com.upiiz.ble_sipi.Models.MuestraDato;
+import com.upiiz.ble_sipi.Models.Paciente;
 import com.upiiz.ble_sipi.Models.Prueba;
 import com.upiiz.ble_sipi.R;
 import com.upiiz.ble_sipi.Tools.MuestrasCache;
@@ -96,6 +97,7 @@ public class EjecutarPruebaActivity extends AppCompatActivity {
 
     private Thread hiloGuardado;
     private volatile boolean corriendo = true;
+    private Paciente paciente;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +112,7 @@ public class EjecutarPruebaActivity extends AppCompatActivity {
 
         config = (Prueba) getIntent().getSerializableExtra("config");
         toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 80);
+        paciente = (Paciente) getIntent().getSerializableExtra("paciente");
 
         bindViews();
         configurarChart();
@@ -446,11 +449,36 @@ public class EjecutarPruebaActivity extends AppCompatActivity {
                     // Guardar muestra — en hilo secundario, no bloquea UI
                     MuestraDato m = new MuestraDato(
                             System.currentTimeMillis(), getFaseActualNombre());
-                    m.emg         = emg;
-                    m.dinamometro = dynamo;
-                    m.accX = lastAccX; m.accY = lastAccY; m.accZ = lastAccZ;
-                    m.gyroX = lastGyroX; m.gyroY = lastGyroY; m.gyroZ = lastGyroZ;
-                    m.pitch = lastPitch; m.roll = lastRoll; m.yaw = lastYaw;
+
+                    // Contexto
+                    m.pruebaId       = config.id;
+                    m.pruebaNombre   = config.nombre;
+                    m.pacienteId     = config.pacienteId;
+                    m.pacienteNombre = paciente != null ? paciente.getNombreCompleto() : "";
+                    m.pacienteEdad   = paciente != null ? paciente.edad : 0;
+                    m.pacienteSexo   = paciente != null ? paciente.sexo : "";
+
+                    // ESP32 — solo si se usa
+                    if (config.usarEMG)         m.emg         = emg;
+                    if (config.usarDinamometro) m.dinamometro = dynamo;
+
+                    // Watch — solo si se usa, con los últimos valores recibidos
+                    if (config.usarAcelerometro) {
+                        m.accX = lastAccX;
+                        m.accY = lastAccY;
+                        m.accZ = lastAccZ;
+                    }
+                    if (config.usarGiroscopio) {
+                        m.gyroX = lastGyroX;
+                        m.gyroY = lastGyroY;
+                        m.gyroZ = lastGyroZ;
+                    }
+                    if (config.usarOrientacion) {
+                        m.pitch = lastPitch;
+                        m.roll  = lastRoll;
+                        m.yaw   = lastYaw;
+                    }
+
                     synchronized (muestras) { muestras.add(m); }
 
                     // Buffer para gráfica — solo agregar, no dibujar

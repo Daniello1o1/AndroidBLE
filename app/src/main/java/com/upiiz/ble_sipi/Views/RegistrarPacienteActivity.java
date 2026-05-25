@@ -25,9 +25,11 @@ import com.upiiz.ble_sipi.Models.PerfilClinico;
 import com.upiiz.ble_sipi.R;
 import com.upiiz.ble_sipi.Repository.PacienteRepository;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 public class RegistrarPacienteActivity extends AppCompatActivity {
 
@@ -95,7 +97,6 @@ public class RegistrarPacienteActivity extends AppCompatActivity {
         etNombre           = layoutPaso1.findViewById(R.id.etNombre);
         etApellidos        = layoutPaso1.findViewById(R.id.etApellidos);
         etFechaNacimiento  = layoutPaso1.findViewById(R.id.etFechaNacimiento);
-        etEdad             = layoutPaso1.findViewById(R.id.etEdad);
         etPeso             = layoutPaso1.findViewById(R.id.etPeso);
         etTalla            = layoutPaso1.findViewById(R.id.etTalla);
         etObservaciones    = layoutPaso1.findViewById(R.id.etObservaciones);
@@ -209,6 +210,29 @@ public class RegistrarPacienteActivity extends AppCompatActivity {
             }
         }
         return true;
+    }
+
+    // Calcular Edad
+    private int calcularEdad(String fechaNacimiento) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            java.util.Date fechaNac = sdf.parse(fechaNacimiento);
+            if (fechaNac == null) return 0;
+
+            Calendar nacimiento = Calendar.getInstance();
+            nacimiento.setTime(fechaNac);
+
+            Calendar hoy = Calendar.getInstance();
+            int edad = hoy.get(Calendar.YEAR) - nacimiento.get(Calendar.YEAR);
+
+            // Ajustar si aún no ha cumplido años este año
+            if (hoy.get(Calendar.DAY_OF_YEAR) < nacimiento.get(Calendar.DAY_OF_YEAR)) {
+                edad--;
+            }
+            return Math.max(0, edad);
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     // ================= FILAS DINÁMICAS =================
@@ -388,8 +412,7 @@ public class RegistrarPacienteActivity extends AppCompatActivity {
         p.fechaNacimiento = getText(etFechaNacimiento);
         p.observaciones   = getText(etObservaciones);
 
-        String edadStr = getText(etEdad);
-        p.edad = edadStr.isEmpty() ? 0 : Integer.parseInt(edadStr);
+        p.edad = calcularEdad(getText(etFechaNacimiento));
 
         String pesoStr = getText(etPeso);
         p.peso = pesoStr.isEmpty() ? 0f : Float.parseFloat(pesoStr);

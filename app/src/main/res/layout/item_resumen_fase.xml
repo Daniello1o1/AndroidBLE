@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:text="EMG"
             android:textSize="12sp"
-            android:textColor="#888888"
+            android:textColor="@color/text_secondary"
             android:layout_marginBottom="4dp"/>
 
         <LinearLayout
@@ -48,7 +48,7 @@
                 <TextView
                     android:text="MAV"
                     android:textSize="11sp"
-                    android:textColor="#888888"
+                    android:textColor="@color/text_secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
                 <TextView
@@ -68,7 +68,7 @@
                 <TextView
                     android:text="WL"
                     android:textSize="11sp"
-                    android:textColor="#888888"
+                    android:textColor="@color/text_secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
                 <TextView
@@ -88,7 +88,7 @@
                 <TextView
                     android:text="OrderV"
                     android:textSize="11sp"
-                    android:textColor="#888888"
+                    android:textColor="@color/text_secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
                 <TextView
@@ -108,7 +108,7 @@
                 <TextView
                     android:text="Dinamómetro"
                     android:textSize="11sp"
-                    android:textColor="#888888"
+                    android:textColor="@color/text_secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
                 <TextView
@@ -129,7 +129,7 @@
             android:layout_height="wrap_content"
             android:text="Espectro EMG"
             android:textSize="12sp"
-            android:textColor="#888888"
+            android:textColor="@color/text_secondary"
             android:layout_marginBottom="4dp"/>
 
         <com.github.mikephil.charting.charts.LineChart

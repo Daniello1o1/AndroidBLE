@@ -52,5 +52,5 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     implementation(libs.mpandroidchart)
     implementation("com.github.wendykierp:JTransforms:3.1")
-
+    implementation("com.google.firebase:firebase-storage")
 }

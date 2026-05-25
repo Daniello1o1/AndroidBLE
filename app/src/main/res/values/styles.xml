@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ===== ESTILOS BASE ===== -->
+    <style name="TextAppearance.BleSipi"
+        parent="TextAppearance.MaterialComponents.Body1" />
+
+    <style name="Widget.BleSipi"
+        parent="Widget.MaterialComponents.Button" />
+
+    <!-- ===== BOTONES ===== -->
+    <style name="Widget.BleSipi.Button"
+        parent="Widget.MaterialComponents.Button">
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="cornerRadius">10dp</item>
+        <item name="backgroundTint">@color/primary</item>
+        <item name="android:textColor">@color/on_primary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:letterSpacing">0.05</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="Widget.BleSipi.Button.Outlined"
+        parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="cornerRadius">10dp</item>
+        <item name="strokeColor">@color/primary</item>
+        <item name="android:textColor">@color/primary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="Widget.BleSipi.Button.Text"
+        parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/primary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="Widget.BleSipi.Button.Danger"
+        parent="Widget.BleSipi.Button">
+        <item name="backgroundTint">@color/error</item>
+    </style>
+
+    <!-- ===== CARDS ===== -->
+    <style name="Widget.BleSipi.Card"
+        parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">12dp</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="strokeColor">@color/stroke</item>
+        <item name="cardBackgroundColor">@color/surface</item>
+    </style>
+
+    <!-- ===== TEXT INPUT ===== -->
+    <style name="Widget.BleSipi.TextInput"
+        parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/primary</item>
+        <item name="hintTextColor">@color/primary</item>
+        <item name="boxCornerRadiusTopStart">10dp</item>
+        <item name="boxCornerRadiusTopEnd">10dp</item>
+        <item name="boxCornerRadiusBottomStart">10dp</item>
+        <item name="boxCornerRadiusBottomEnd">10dp</item>
+    </style>
+
+    <!-- ===== TABS ===== -->
+    <style name="Widget.BleSipi.Tab"
+        parent="Widget.MaterialComponents.TabLayout">
+        <item name="tabTextColor">@color/text_secondary</item>
+        <item name="tabSelectedTextColor">@color/primary</item>
+        <item name="tabIndicatorColor">@color/primary</item>
+        <item name="tabIndicatorHeight">3dp</item>
+        <item name="tabBackground">@color/surface</item>
+        <item name="tabTextAppearance">@style/TextAppearance.BleSipi.Tab</item>
+    </style>
+
+    <style name="TextAppearance.BleSipi.Tab"
+        parent="TextAppearance.MaterialComponents.Button">
+        <item name="android:textSize">13sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <!-- ===== TIPOGRAFÍA ===== -->
+    <style name="TextAppearance.BleSipi.Title">
+        <item name="android:textSize">22sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/on_background</item>
+    </style>
+
+    <style name="TextAppearance.BleSipi.Subtitle">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/text_secondary</item>
+    </style>
+
+    <style name="TextAppearance.BleSipi.Label">
+        <item name="android:textSize">11sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/text_secondary</item>
+    </style>
+
+    <style name="TextAppearance.BleSipi.Value">
+        <item name="android:textSize">13sp</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:textColor">@color/on_background</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.BleSipi.Metric">
+        <item name="android:textSize">20sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/primary</item>
+    </style>
+
+    <!-- ===== SECCIONES ===== -->
+    <style name="Widget.BleSipi.SectionHeader">
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:background">@color/surface</item>
+    </style>
+
+    <!-- ===== INDICADORES DE ESTADO ===== -->
+    <style name="Widget.BleSipi.StatusDot">
+        <item name="android:layout_width">12dp</item>
+        <item name="android:layout_height">12dp</item>
+    </style>
+
+</resources>
+

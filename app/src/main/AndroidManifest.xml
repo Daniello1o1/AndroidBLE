@@ -22,7 +22,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Ble_sipi">
+        android:theme="@style/Theme.BleSipi.Splash">
         <activity
             android:name=".Views.RegistroUsuarioActivity"
             android:exported="false" />
@@ -74,13 +74,9 @@
         <activity
             android:name=".Views.ConfigPruebaActivity"
             android:exported="false" />
-        <activity
-            android:name=".Views.ReportActivity"
-            android:exported="false" />
 
         <service android:name=".BLE.BLEService" />
 
-        <activity android:name=".Views.WearDataActivity" />
 
         <service
             android:name=".BLE.DataLayerListenerService"
@@ -95,9 +91,6 @@
             </intent-filter>
         </service>
 
-        <activity
-            android:name=".Views.AnalisisActivity"
-            android:exported="false" />
         <activity
             android:name=".Views.MainActivity"
             android:exported="true">

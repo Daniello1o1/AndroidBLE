@@ -7,17 +7,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F5F5F5"
+    android:background="@color/background"
     tools:context=".Views.ListaPruebasActivity">
 
     <!-- Header -->
     <LinearLayout
+        android:background="@android:color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:padding="16dp"
-        android:background="@android:color/white">
+        android:padding="16dp">
 
         <TextView
             android:layout_width="0dp"
@@ -67,14 +67,14 @@
             android:layout_height="wrap_content"
             android:text="No hay pruebas aún"
             android:textSize="16sp"
-            android:textColor="#888888"/>
+            android:textColor="@color/text_secondary"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Toca + Nueva para crear una"
             android:textSize="13sp"
-            android:textColor="#BBBBBB"
+            android:textColor="@color/text_disabled"
             android:layout_marginTop="4dp"/>
 
     </LinearLayout>

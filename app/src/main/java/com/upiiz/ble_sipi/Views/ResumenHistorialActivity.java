@@ -1,5 +1,7 @@
 package com.upiiz.ble_sipi.Views;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -15,6 +18,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.google.android.material.button.MaterialButton;
 import com.upiiz.ble_sipi.R;
 import com.upiiz.ble_sipi.Tools.EMGFrequencyAnalyzer;
 import com.upiiz.ble_sipi.Tools.ReporteGenerator;
@@ -22,7 +26,9 @@ import com.upiiz.ble_sipi.Models.Ejecucion;
 import com.upiiz.ble_sipi.Models.Prueba;
 
 import android.graphics.Color;
+import android.widget.Toast;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,12 +55,17 @@ public class ResumenHistorialActivity extends AppCompatActivity {
         tieneCSVLocal = ReporteGenerator.existeCSVLocal(
                 this, prueba.id, ejecucion.id);
 
+        if (!tieneCSVLocal) {
+            // Intentar descargar de Storage
+            descargarCSVSiDisponible();
+        }
+
         configurarHeader();
         construirTarjetasPorFase();
 
         // Ocultar exportar CSV/PDF — no aplica desde historial
-        findViewById(R.id.btnExportarPDF).setVisibility(View.GONE);
-        findViewById(R.id.btnExportarCSV).setVisibility(View.GONE);
+        MaterialButton btnPDF = findViewById(R.id.btnExportarPDF);
+        btnPDF.setOnClickListener(v -> exportarPDFHistorial());
     }
 
     private void configurarHeader() {
@@ -108,6 +119,27 @@ public class ResumenHistorialActivity extends AppCompatActivity {
                         getFloat(m, "dynMAV"),
                         emgFase);
             }
+        }
+    }
+
+    // Exportar
+
+    private void exportarPDFHistorial() {
+        try {
+            File archivo = ReporteGenerator.exportarPDFHistorial(
+                    this, prueba, ejecucion);  // sin emgPorFase
+
+            Uri uri = FileProvider.getUriForFile(
+                    this, getPackageName() + ".provider", archivo);
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("application/pdf");
+            intent.putExtra(Intent.EXTRA_STREAM, uri);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(Intent.createChooser(intent, "Compartir PDF"));
+
+        } catch (Exception e) {
+            Toast.makeText(this, "Error al generar PDF: " + e.getMessage(),
+                    Toast.LENGTH_LONG).show();
         }
     }
 
@@ -198,5 +230,39 @@ public class ResumenHistorialActivity extends AppCompatActivity {
         if (val instanceof Double) return ((Double) val).floatValue();
         if (val instanceof Float)  return (Float) val;
         return 0f;
+    }
+    private void descargarCSVSiDisponible() {
+        // Mostrar indicador de descarga
+        Toast.makeText(this, "Descargando datos...", Toast.LENGTH_SHORT).show();
+
+        ReporteGenerator.descargarCSVDeStorage(
+                this,
+                prueba.id,
+                ejecucion.id,
+                new ReporteGenerator.OnDescargaListener() {
+                    @Override
+                    public void onExito(File archivo) {
+                        tieneCSVLocal = true;
+                        runOnUiThread(() -> {
+                            // Actualizar subtítulo para indicar que FFT está disponible
+                            configurarHeader();
+                            Toast.makeText(ResumenHistorialActivity.this,
+                                    "Datos descargados — FFT disponible",
+                                    Toast.LENGTH_SHORT).show();
+                        });
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        android.util.Log.w("STORAGE",
+                                "CSV no disponible en Storage: " + e.getMessage());
+                        // Silencioso — simplemente no habrá FFT
+                    }
+
+                    @Override
+                    public void onProgreso(int porcentaje) {
+                        android.util.Log.d("STORAGE", "Descarga: " + porcentaje + "%");
+                    }
+                });
     }
 }

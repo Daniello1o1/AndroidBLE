@@ -1,9 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="turqoise">#75DDDD</color>
-    <color name="btn_green">#036666</color>
-    <color name="btn_gray">#3a506b</color>
-    <color name="back_green">#BBDBC7</color>
+    <!-- Primarios -->
+    <color name="primary">#1565C0</color>         <!-- Azul médico -->
+    <color name="primary_dark">#0D47A1</color>     <!-- Azul oscuro -->
+    <color name="primary_light">#E3F2FD</color>    <!-- Azul muy claro -->
+    <color name="primary_variant">#1976D2</color>  <!-- Azul medio -->
+
+    <!-- Secundarios -->
+    <color name="accent">#0097A7</color>           <!-- Teal médico -->
+    <color name="accent_light">#E0F7FA</color>
+
+    <!-- Fondo -->
+    <color name="background">#F5F8FF</color>       <!-- Azul casi blanco -->
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#EEF2FF</color>
+
+    <!-- Texto -->
+    <color name="on_primary">#FFFFFF</color>
+    <color name="on_background">#1A1A2E</color>    <!-- Azul muy oscuro -->
+    <color name="text_secondary">#5C6B8A</color>   <!-- Gris azulado -->
+    <color name="text_hint">#9EADC8</color>
+    <color name="text_disabled">#9EADC8</color>
+
+    <!-- Estados -->
+    <color name="success">#2E7D32</color>
+    <color name="error">#C62828</color>
+    <color name="warning">#F57F17</color>
+
+    <!-- Bordes y divisores -->
+    <color name="divider">#DDEAFF</color>
+    <color name="stroke">#C5D8FF</color>
+
+    <!-- Gráficas -->
+    <color name="chart_emg">#1565C0</color>
+    <color name="chart_dynamo">#0097A7</color>
+    <color name="chart_fft">#FF5722</color>
+    <color name="not_yet">#E0E0E0</color>
+    <color name="alt_background">#F0F0F0</color>
 </resources>

@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5"
+    android:background="@color/background"
     tools:context=".Views.DetallePruebaActivity">
     <LinearLayout
         android:layout_width="match_parent"
@@ -105,7 +105,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:textColor="#E53935"
+                android:textColor="@color/error"
                 android:textSize="13sp"/>
 
         </LinearLayout>
@@ -211,7 +211,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Borrar"
-                app:backgroundTint="#E53935"/>
+                app:backgroundTint="@color/error"/>
 
         </LinearLayout>
 

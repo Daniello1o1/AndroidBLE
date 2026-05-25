@@ -28,8 +28,10 @@ import com.upiiz.ble_sipi.Models.PerfilClinico;
 import com.upiiz.ble_sipi.R;
 import com.upiiz.ble_sipi.Repository.PacienteRepository;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 public class DetallePacienteActivity extends AppCompatActivity {
 
@@ -135,7 +137,6 @@ public class DetallePacienteActivity extends AppCompatActivity {
         TextInputEditText etNombre   = contenido.findViewById(R.id.etNombre);
         TextInputEditText etApellidos = contenido.findViewById(R.id.etApellidos);
         TextInputEditText etFecha    = contenido.findViewById(R.id.etFechaNacimiento);
-        TextInputEditText etEdad     = contenido.findViewById(R.id.etEdad);
         TextInputEditText etPeso     = contenido.findViewById(R.id.etPeso);
         TextInputEditText etTalla    = contenido.findViewById(R.id.etTalla);
         TextInputEditText etObs      = contenido.findViewById(R.id.etObservaciones);
@@ -144,7 +145,6 @@ public class DetallePacienteActivity extends AppCompatActivity {
         etNombre.setText(paciente.nombre);
         etApellidos.setText(paciente.apellidos);
         etFecha.setText(paciente.fechaNacimiento);
-        etEdad.setText(String.valueOf(paciente.edad));
         etPeso.setText(String.valueOf(paciente.peso));
         etTalla.setText(String.valueOf(paciente.talla));
         etObs.setText(paciente.observaciones);
@@ -174,8 +174,7 @@ public class DetallePacienteActivity extends AppCompatActivity {
             paciente.apellidos       = getText(etApellidos);
             paciente.fechaNacimiento = getText(etFecha);
             paciente.observaciones   = getText(etObs);
-            String edadStr = getText(etEdad);
-            paciente.edad  = edadStr.isEmpty() ? 0 : Integer.parseInt(edadStr);
+            paciente.edad = calcularEdad(getText(etFecha));
             String pesoStr = getText(etPeso);
             paciente.peso  = pesoStr.isEmpty() ? 0f : Float.parseFloat(pesoStr);
             String tallaStr = getText(etTalla);
@@ -205,6 +204,27 @@ public class DetallePacienteActivity extends AppCompatActivity {
                 }
             });
         });
+    }
+    private int calcularEdad(String fechaNacimiento) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            java.util.Date fechaNac = sdf.parse(fechaNacimiento);
+            if (fechaNac == null) return 0;
+
+            Calendar nacimiento = Calendar.getInstance();
+            nacimiento.setTime(fechaNac);
+
+            Calendar hoy = Calendar.getInstance();
+            int edad = hoy.get(Calendar.YEAR) - nacimiento.get(Calendar.YEAR);
+
+            // Ajustar si aún no ha cumplido años este año
+            if (hoy.get(Calendar.DAY_OF_YEAR) < nacimiento.get(Calendar.DAY_OF_YEAR)) {
+                edad--;
+            }
+            return Math.max(0, edad);
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     // ================= SECCIÓN PERFIL CLÍNICO =================

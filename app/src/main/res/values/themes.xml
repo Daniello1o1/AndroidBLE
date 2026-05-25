@@ -1,19 +1,48 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Ble_sipi" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.BleSipi" parent="Theme.MaterialComponents.Light.NoActionBar">
+
+        <!-- Colores principales -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary_dark</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorSecondary">@color/accent</item>
+        <item name="colorOnSecondary">@color/on_primary</item>
+
+        <!-- Fondo -->
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorSurface">@color/surface</item>
+
+        <!-- Texto -->
+        <item name="android:textColorPrimary">@color/on_background</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:textColorHint">@color/text_hint</item>
+
+        <!-- Fuente -->
+        <item name="android:fontFamily">sans-serif</item>
+
+        <!-- Botones -->
+        <item name="materialButtonStyle">@style/Widget.BleSipi.Button</item>
+        <item name="borderlessButtonStyle">@style/Widget.BleSipi.Button.Text</item>
+
+        <!-- Cards -->
+        <item name="materialCardViewStyle">@style/Widget.BleSipi.Card</item>
+
+        <!-- TextInputLayout -->
+        <item name="textInputStyle">@style/Widget.BleSipi.TextInput</item>
+
+        <!-- TabLayout -->
+        <item name="tabStyle">@style/Widget.BleSipi.Tab</item>
+
+        <!-- Status bar -->
+        <item name="android:statusBarColor">@color/primary_dark</item>
+        <item name="android:windowLightStatusBar">false</item>
+
     </style>
 
-    <style name="Theme.Ble_sipi" parent="Base.Theme.Ble_sipi" />
+    <!-- Splash sin action bar -->
+    <style name="Theme.BleSipi.Splash" parent="Theme.BleSipi">
+        <item name="android:windowBackground">@color/surface</item>
+    </style>
 
-    <style name="BACKGROUND">
-        <item name="android:background">@color/back_green</item>
-    </style>
-    <style name="TEXT">
-        <item name="android:textColor">@color/black</item>
-    </style>
-    <style name="BUTTON">
-        <item name="android:textColor">@color/white</item>
-    </style>
 </resources>
