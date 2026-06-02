@@ -91,7 +91,7 @@ public class SeleccionarSensoresActivity extends AppCompatActivity {
                 // Navegar a pantalla 3
                 Intent intent = new Intent(
                         SeleccionarSensoresActivity.this,
-                        ConectarDispositivosActivity.class);
+                        MenuPrincipalActivity.class);
                 intent.putExtra("config", config);
                 startActivity(intent);
 

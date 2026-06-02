@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
@@ -69,6 +70,27 @@ public class ResumenPruebaActivity extends AppCompatActivity {
         guardarEjecucionEnFirestore();
 
         findViewById(R.id.btnExportarPDF).setOnClickListener(v -> exportarPDF());
+        findViewById(R.id.btnFinalizarResumen).setOnClickListener(v -> {
+            irAlHistorial();
+        });
+
+        getOnBackPressedDispatcher().addCallback(this,
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        // No hacer nada
+                        // Forzar al usuario a usar el botón
+                    }
+                });
+    }
+
+    private void irAlHistorial() {
+        Intent intent = new Intent(this, HistorialActivity.class);
+        intent.putExtra("prueba", config);
+        // Limpiar el stack — quitar ConectarDispositivos, VerificarSenal, EjecutarPrueba
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
     }
 
     // ================= CALCULAR TODO =================

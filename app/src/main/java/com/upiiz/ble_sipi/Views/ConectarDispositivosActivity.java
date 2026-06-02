@@ -28,6 +28,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.material.button.MaterialButton;
 import com.upiiz.ble_sipi.BLE.BLEService;
 import com.upiiz.ble_sipi.BLE.DataLayerListenerService;
+import com.upiiz.ble_sipi.Models.Paciente;
 import com.upiiz.ble_sipi.Models.Prueba;
 import com.upiiz.ble_sipi.R;
 
@@ -55,6 +56,8 @@ public class ConectarDispositivosActivity extends AppCompatActivity {
     private TextView tvEstadoESP32, tvEstadoWatch;
     private MaterialButton btnReintentar, btnIniciarPrueba;
     private static final int REQUEST_ENABLE_BT = 1;
+
+    private Paciente paciente;
 
     private void verificarBluetooth() {
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -107,6 +110,7 @@ public class ConectarDispositivosActivity extends AppCompatActivity {
             return insets;
         });
         config = (Prueba) getIntent().getSerializableExtra("config");
+        paciente   = (Paciente) getIntent().getSerializableExtra("paciente");
 
 
 
@@ -279,7 +283,9 @@ public class ConectarDispositivosActivity extends AppCompatActivity {
     private void irAPrueba() {
         Intent intent = new Intent(this, VerificarSenalActivity.class);
         intent.putExtra("config", config);
+        intent.putExtra("paciente", paciente);
         startActivity(intent);
+        finish(); // ← agregar esto — elimina ConectarDispositivos del stack
     }
 
     // ================= CICLO DE VIDA =================

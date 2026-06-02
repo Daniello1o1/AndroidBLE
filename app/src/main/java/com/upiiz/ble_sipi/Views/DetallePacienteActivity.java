@@ -385,8 +385,7 @@ public class DetallePacienteActivity extends AppCompatActivity {
         }
 
         // Botón agregar nuevo
-        MaterialButton btnAgregar = new MaterialButton(this,
-                null, com.google.android.material.R.style.Widget_MaterialComponents_Button_TextButton);
+        MaterialButton btnAgregar = new MaterialButton(this);
         btnAgregar.setText("+ Agregar antecedente");
         btnAgregar.setOnClickListener(v -> {
             View fila = LayoutInflater.from(this)
@@ -481,8 +480,7 @@ public class DetallePacienteActivity extends AppCompatActivity {
             container.addView(fila);
         }
 
-        MaterialButton btnAgregar = new MaterialButton(this,
-                null, com.google.android.material.R.style.Widget_MaterialComponents_Button_TextButton);
+        MaterialButton btnAgregar = new MaterialButton(this);
         btnAgregar.setOnClickListener(v -> {
             View fila = LayoutInflater.from(this)
                     .inflate(R.layout.item_antecedente_familiar, container, false);
@@ -570,8 +568,7 @@ public class DetallePacienteActivity extends AppCompatActivity {
             container.addView(fila);
         }
 
-        MaterialButton btnAgregar = new MaterialButton(this,
-                null, com.google.android.material.R.style.Widget_MaterialComponents_Button_TextButton);
+        MaterialButton btnAgregar = new MaterialButton(this);
         btnAgregar.setText("+ Agregar medicamento");
         btnAgregar.setOnClickListener(v -> {
             View fila = LayoutInflater.from(this)
@@ -665,8 +662,7 @@ public class DetallePacienteActivity extends AppCompatActivity {
             container.addView(fila);
         }
 
-        MaterialButton btnAgregar = new MaterialButton(this,
-                null, com.google.android.material.R.style.Widget_MaterialComponents_Button_TextButton);
+        MaterialButton btnAgregar = new MaterialButton(this);
         btnAgregar.setText("+ Agregar lesión");
         btnAgregar.setOnClickListener(v -> {
             View fila = LayoutInflater.from(this)

@@ -16,6 +16,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
@@ -122,7 +124,35 @@ public class EjecutarPruebaActivity extends AppCompatActivity {
         iniciarTimer();
         iniciarPlotLoop();
         iniciarHiloGuardado();
+
+        getOnBackPressedDispatcher().addCallback(this,
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+
+                        new AlertDialog.Builder(EjecutarPruebaActivity.this)
+                                .setTitle("¿Salir de la prueba?")
+                                .setMessage("Se perderán todos los datos recopilados hasta ahora.")
+                                .setPositiveButton("Sí, salir", (d, w) -> {
+
+                                    timerHandler.removeCallbacksAndMessages(null);
+                                    plotHandler.removeCallbacksAndMessages(null);
+
+                                    corriendo = false;
+
+                                    if (hiloGuardado != null) {
+                                        hiloGuardado.interrupt();
+                                    }
+
+                                    MuestrasCache.limpiar();
+                                    finish();
+                                })
+                                .setNegativeButton("Continuar prueba", null)
+                                .show();
+                    }
+                });
     }
+
     private void bindViews() {
         tvNombrePrueba = findViewById(R.id.tvNombrePrueba);
         tvFaseActual   = findViewById(R.id.tvFaseActual);

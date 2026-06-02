@@ -55,7 +55,7 @@ public class MenuPrincipalActivity extends AppCompatActivity {
             public void onSuccess(Usuario usuario) {
                 runOnUiThread(() -> {
                     TextView tvUsuario = findViewById(R.id.tvUsuario);
-                    tvUsuario.setText("Dr. " + usuario.getNombreCompleto());
+                    tvUsuario.setText(usuario.getNombreCompleto());
                 });
             }
             @Override

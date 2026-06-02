@@ -29,6 +29,7 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.google.android.material.button.MaterialButton;
 import com.upiiz.ble_sipi.BLE.BLEService;
 import com.upiiz.ble_sipi.BLE.DataLayerListenerService;
+import com.upiiz.ble_sipi.Models.Paciente;
 import com.upiiz.ble_sipi.Models.Prueba;
 import com.upiiz.ble_sipi.R;
 
@@ -55,6 +56,8 @@ public class VerificarSenalActivity extends AppCompatActivity {
     private final Handler plotHandler = new Handler();
     private static final int PLOT_INTERVAL_MS = 50;
 
+    private Paciente paciente;
+
     // UI
     private View cardWatch;
     private TextView tvAcc, tvGyro, tvOri;
@@ -71,6 +74,7 @@ public class VerificarSenalActivity extends AppCompatActivity {
             return insets;
         });
         config = (Prueba) getIntent().getSerializableExtra("config");
+        paciente   = (Paciente) getIntent().getSerializableExtra("paciente");
 
         bindViews();
         configurarChart();
@@ -275,7 +279,9 @@ public class VerificarSenalActivity extends AppCompatActivity {
     private void irAPrueba() {
         Intent intent = new Intent(this, EjecutarPruebaActivity.class);
         intent.putExtra("config", config);
+        intent.putExtra("paciente", paciente);
         startActivity(intent);
+        finish(); // ← agregar esto — elimina VerificarSenal del stack
     }
 
     // ================= CICLO DE VIDA =================
