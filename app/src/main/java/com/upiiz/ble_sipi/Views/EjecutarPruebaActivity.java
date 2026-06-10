@@ -286,7 +286,10 @@ public class EjecutarPruebaActivity extends AppCompatActivity {
 
                 try {
                     JSONObject json = new JSONObject(data);
-                    lastWatchTimestamp = json.getLong("timestamp");
+                    lastWatchTimestamp = json.optLong(
+                            "timestamp",
+                            System.currentTimeMillis()
+                    );
                     lastAccX  = (float) json.getDouble("accX");
                     lastAccY  = (float) json.getDouble("accY");
                     lastAccZ  = (float) json.getDouble("accZ");
@@ -345,7 +348,6 @@ public class EjecutarPruebaActivity extends AppCompatActivity {
                 ContextCompat.RECEIVER_NOT_EXPORTED
         );
     }
-
     // ================= GRÁFICA =================
 
     private void configurarChart() {
