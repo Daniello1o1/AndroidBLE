@@ -1,5 +1,6 @@
 package com.upiiz.ble_sipi.Views;
 
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -108,39 +109,73 @@ public class ResumenPruebaActivity extends AppCompatActivity {
 
             List<Float> emg    = new ArrayList<>();
             List<Float> dynamo = new ArrayList<>();
+            List<Float> gx     = new ArrayList<>();
+            List<Float> gy     = new ArrayList<>();
+            List<Float> gz     = new ArrayList<>();
+            List<Float> pitchL = new ArrayList<>();
+            List<Float> rollL  = new ArrayList<>();
+            List<Float> yawL   = new ArrayList<>();
+
             for (MuestraDato m : datos) {
                 emg.add(m.emg);
                 dynamo.add(m.dinamometro);
+                gx.add(m.gyroX);
+                gy.add(m.gyroY);
+                gz.add(m.gyroZ);
+                pitchL.add(m.pitch);
+                rollL.add(m.roll);
+                yawL.add(m.yaw);
             }
 
-            // Un solo análisis completo por fase
             double[] mags = emg.size() >= 1024
                     ? analyzer.computeMagnitudes(emg, 0) : null;
+
             MusculoAnalyzer.ResultadoAnalisis resultado =
-                    MusculoAnalyzer.analizar(emg, dynamo, mags);
+                    MusculoAnalyzer.analizar(emg, dynamo, gx, gy, gz,
+                            pitchL, rollL, yawL, mags);
 
             analisisPorFase.put(fase, resultado);
+            float romMax = Math.max(
+                    Float.isNaN(resultado.romPitch) ? 0 : resultado.romPitch,
+                    Math.max(
+                            Float.isNaN(resultado.romRoll) ? 0 : resultado.romRoll,
+                            Float.isNaN(resultado.romYaw)  ? 0 : resultado.romYaw));
 
-            // Métricas básicas tomadas del mismo resultado
             metricasPorFase.put(fase, new float[]{
                     resultado.mav,
                     resultado.wl,
                     resultado.orderV,
-                    resultado.dynMav
-            });
+                    resultado.dynMav,
+                    resultado.rms,
+                    resultado.frecuenciaMediana,
+                    resultado.fuerzaMaxima,
+                    romMax,
+                    resultado.danielsEstimado});
         }
 
         // Global
         List<Float> emgTotal    = new ArrayList<>();
         List<Float> dynamoTotal = new ArrayList<>();
+        List<Float> gxTotal     = new ArrayList<>();
+        List<Float> gyTotal     = new ArrayList<>();
+        List<Float> gzTotal     = new ArrayList<>();
+        List<Float> pitchLTotal = new ArrayList<>();
+        List<Float> rollLTotal  = new ArrayList<>();
+        List<Float> yawLTotal   = new ArrayList<>();
         for (MuestraDato m : muestras) {
             emgTotal.add(m.emg);
             dynamoTotal.add(m.dinamometro);
+            gxTotal.add(m.gyroX);
+            gyTotal.add(m.gyroY);
+            gzTotal.add(m.gyroZ);
+            pitchLTotal.add(m.pitch);
+            rollLTotal.add(m.roll);
+            yawLTotal.add(m.yaw);
         }
 
         double[] magsGlobal = emgTotal.size() >= 1024
                 ? analyzer.computeMagnitudes(emgTotal, 0) : null;
-        analisisGlobal = MusculoAnalyzer.analizar(emgTotal, dynamoTotal, magsGlobal);
+        analisisGlobal = MusculoAnalyzer.analizar(emgTotal, dynamoTotal, gxTotal, gyTotal, gzTotal, pitchLTotal, rollLTotal, yawLTotal, magsGlobal);
 
         metricasGlobales = new float[]{
                 analisisGlobal.mav,
@@ -208,14 +243,38 @@ public class ResumenPruebaActivity extends AppCompatActivity {
         }
 
         Map<String, Map<String, Float>> metricasFaseFirestore = new LinkedHashMap<>();
-        for (Map.Entry<String, float[]> entry : metricasPorFase.entrySet()) {
-            float[] vals = entry.getValue();
+        for (Map.Entry<String, MusculoAnalyzer.ResultadoAnalisis> entry
+                : analisisPorFase.entrySet()) {
+            String fase = entry.getKey();
+            MusculoAnalyzer.ResultadoAnalisis a = entry.getValue();
+
             Map<String, Float> faseMapa = new HashMap<>();
-            faseMapa.put("emgMAV",    vals[0]);
-            faseMapa.put("emgWL",     vals[1]);
-            faseMapa.put("emgOrderV", vals[2]);
-            faseMapa.put("dynMAV",    vals[3]);
-            metricasFaseFirestore.put(entry.getKey(), faseMapa);
+            // EMG
+            faseMapa.put("emgRMS",          a.rms);
+            faseMapa.put("emgMAV",          a.mav);
+            faseMapa.put("emgWL",           a.wl);
+            faseMapa.put("emgFrecMediana",  a.frecuenciaMediana);
+            faseMapa.put("emgIndiceFatiga", a.indiceFatigaEMG);
+            // Dinamómetro
+            faseMapa.put("dynFuerzaMax",    a.fuerzaMaxima);
+            faseMapa.put("dynTiempoPico",   a.tiempoHastaPico);
+            faseMapa.put("dynRFD",          a.rfd);
+            faseMapa.put("dynImpulso",      a.impulso);
+            // IMU
+            faseMapa.put("romPitch",        a.romPitch);
+            faseMapa.put("romRoll",         a.romRoll);
+            faseMapa.put("romYaw",          a.romYaw);
+            faseMapa.put("omegaMax",        a.velocidadAngularMaxima);
+            faseMapa.put("omegaProm",       a.velocidadAngularPromedio);
+            faseMapa.put("fatigaMecanica",  a.indiceFatigaMecanica);
+            // Fusión
+            faseMapa.put("eficMuscular",    a.eficienciaMuscular);
+            faseMapa.put("eficMovimiento",  a.eficienciaMovimiento);
+            faseMapa.put("onsetFuerza",     a.onsetEMGFuerza);
+            faseMapa.put("onsetMovimiento", a.onsetEMGMovimiento);
+            faseMapa.put("danielsEstimado", (float) a.danielsEstimado);
+
+            metricasFaseFirestore.put(fase, faseMapa);
         }
 
         Ejecucion ejecucion = new Ejecucion();
@@ -230,26 +289,31 @@ public class ResumenPruebaActivity extends AppCompatActivity {
 
         // Análisis global
         if (analisisGlobal != null) {
-            ejecucion.rms                = analisisGlobal.rms;
-            ejecucion.var                = analisisGlobal.var;
-            ejecucion.zc                 = analisisGlobal.zc;
-            ejecucion.ssc                = analisisGlobal.ssc;
-            ejecucion.frecuenciaMediana  = analisisGlobal.frecuenciaMediana;
-            ejecucion.frecuenciaMedia    = analisisGlobal.frecuenciaMedia;
-            ejecucion.potenciaTotal      = analisisGlobal.potenciaTotal;
-            ejecucion.ratioBandas        = analisisGlobal.ratioBandas;
-            ejecucion.indiceFatiga       = analisisGlobal.indiceFatiga;
-            ejecucion.tasaDecaimientoRMS = analisisGlobal.tasaDecaimientoRMS;
-            ejecucion.fuerzaMaxima       = analisisGlobal.fuerzaMaxima;
-            ejecucion.fuerzaMinima       = analisisGlobal.fuerzaMinima;
-            ejecucion.tiempoHastaPico    = analisisGlobal.tiempoHastaPico;
-            ejecucion.rfd                = analisisGlobal.rfd;
-            ejecucion.impulso            = analisisGlobal.impulso;
-            ejecucion.coeficienteVariacion = analisisGlobal.coeficienteVariacion;
-            ejecucion.eficienciaMusular  = analisisGlobal.eficienciaMusular;
-            ejecucion.onsetMusular       = analisisGlobal.onsetMusular;
-            ejecucion.danielsEstimado    = analisisGlobal.danielsEstimado;
-            ejecucion.danielsAsignado    = -1;
+            ejecucion.rms                    = analisisGlobal.rms;
+            ejecucion.mav                    = analisisGlobal.mav;
+            ejecucion.wl                     = analisisGlobal.wl;
+            ejecucion.frecuenciaMediana      = analisisGlobal.frecuenciaMediana;
+            ejecucion.indiceFatigaEMG        = analisisGlobal.indiceFatigaEMG;
+            ejecucion.fuerzaMaxima           = analisisGlobal.fuerzaMaxima;
+            ejecucion.tiempoHastaPico        = analisisGlobal.tiempoHastaPico;
+            ejecucion.rfd                    = analisisGlobal.rfd;
+            ejecucion.impulso                = analisisGlobal.impulso;
+            ejecucion.romPitch               = analisisGlobal.romPitch;
+            ejecucion.romRoll                = analisisGlobal.romRoll;
+            ejecucion.romYaw                 = analisisGlobal.romYaw;
+            ejecucion.velocidadAngularMaxima   = analisisGlobal.velocidadAngularMaxima;
+            ejecucion.velocidadAngularPromedio = analisisGlobal.velocidadAngularPromedio;
+            ejecucion.indiceFatigaMecanica   = analisisGlobal.indiceFatigaMecanica;
+            ejecucion.eficienciaMuscular     = analisisGlobal.eficienciaMuscular;
+            ejecucion.eficienciaMovimiento   = analisisGlobal.eficienciaMovimiento;
+            ejecucion.onsetEMGFuerza         = analisisGlobal.onsetEMGFuerza;
+            ejecucion.onsetEMGMovimiento     = analisisGlobal.onsetEMGMovimiento;
+            ejecucion.danielsEstimado        = analisisGlobal.danielsEstimado;
+            ejecucion.danielsAsignado        = -1;
+            ejecucion.emgMAVTotal            = analisisGlobal.mav;
+            ejecucion.emgWLTotal             = analisisGlobal.wl;
+            ejecucion.emgOrderVTotal         = analisisGlobal.orderV;
+            ejecucion.dynMAVTotal            = analisisGlobal.dynMav;
         }
 
         repository.guardarEjecucion(config.id, ejecucion,

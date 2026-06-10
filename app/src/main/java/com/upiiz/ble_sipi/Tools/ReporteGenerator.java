@@ -46,56 +46,6 @@ public class ReporteGenerator {
 
     // ================= CSV =================
 
-    public static File exportarCSV(Context context,
-                                   Prueba config,
-                                   List<MuestraDato> muestras) throws IOException {
-
-        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
-                .format(new Date());
-        String nombre = config.nombre.replaceAll("\\s+", "_") + "_" + timestamp + ".csv";
-
-        File dir = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
-        File archivo = new File(dir, nombre);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("prueba_id,prueba_nombre,ejecucion_id,fecha_ejecucion,")
-                .append("paciente_id,paciente_nombre,paciente_edad,paciente_sexo,")
-                .append("fase,timestamp_ms,")
-                .append("emg,dinamometro,")
-                .append("accX,accY,accZ,")
-                .append("gyroX,gyroY,gyroZ,")
-                .append("pitch,roll,yaw\n");
-
-        for (MuestraDato m : muestras) {
-            sb.append(m.pruebaId).append(",");
-            sb.append(escaparCSV(m.pruebaNombre)).append(",");
-            sb.append(m.ejecucionId != null ? m.ejecucionId : "").append(",");
-            sb.append(m.timestampMs).append(",");
-            sb.append(m.pacienteId != null ? m.pacienteId : "").append(",");
-            sb.append(escaparCSV(m.pacienteNombre)).append(",");
-            sb.append(m.pacienteEdad).append(",");
-            sb.append(escaparCSV(m.pacienteSexo)).append(",");
-            sb.append(escaparCSV(m.fase)).append(",");
-            sb.append(m.timestampMs).append(",");
-            sb.append(String.format(Locale.US, "%.4f", m.emg)).append(",");
-            sb.append(String.format(Locale.US, "%.4f", m.dinamometro)).append(",");
-            sb.append(String.format(Locale.US, "%.4f", m.accX)).append(",");
-            sb.append(String.format(Locale.US, "%.4f", m.accY)).append(",");
-            sb.append(String.format(Locale.US, "%.4f", m.accZ)).append(",");
-            sb.append(String.format(Locale.US, "%.4f", m.gyroX)).append(",");
-            sb.append(String.format(Locale.US, "%.4f", m.gyroY)).append(",");
-            sb.append(String.format(Locale.US, "%.4f", m.gyroZ)).append(",");
-            sb.append(String.format(Locale.US, "%.4f", m.pitch)).append(",");
-            sb.append(String.format(Locale.US, "%.4f", m.roll)).append(",");
-            sb.append(String.format(Locale.US, "%.4f", m.yaw)).append("\n");
-        }
-
-        FileOutputStream fos = new FileOutputStream(archivo);
-        fos.write(sb.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
-        fos.close();
-
-        return archivo;
-    }
     public static File exportarCSVGlobal(Context context,
                                          List<Ejecucion> ejecuciones,
                                          List<Paciente> pacientes,
@@ -124,6 +74,8 @@ public class ReporteGenerator {
 
         StringBuilder sb = new StringBuilder();
 
+
+
         // ===== ENCABEZADO =====
         // Contexto paciente
         sb.append("paciente_id,nombre,apellidos,edad,sexo,peso,talla,");
@@ -136,18 +88,18 @@ public class ReporteGenerator {
         sb.append("fecha_ejecucion,num_muestras,");
 
         // Métricas globales EMG
-        sb.append("emg_rms,emg_mav,emg_wl,emg_orderv,emg_varianza,");
-        sb.append("emg_zc,emg_ssc,");
-        sb.append("emg_frec_mediana,emg_frec_media,");
-        sb.append("emg_potencia_total,emg_ratio_bandas,");
-        sb.append("emg_indice_fatiga,emg_decaimiento_rms,");
+        sb.append("emg_rms,emg_mav,emg_wl,emg_frec_mediana,emg_indice_fatiga,");
 
         // Métricas globales dinamómetro
-        sb.append("dyn_fuerza_max,dyn_fuerza_min,dyn_fuerza_promedio,");
-        sb.append("dyn_tiempo_pico_ms,dyn_rfd,dyn_impulso,dyn_cv,");
+        sb.append("dyn_fuerza_max,dyn_tiempo_pico_ms,dyn_rfd,dyn_impulso,");
+
+        // IMU
+        sb.append("rom_pitch,rom_roll,rom_yaw,");
+        sb.append("omega_max,omega_promedio,indice_fatiga_mecanica,");
 
         // Métricas combinadas
-        sb.append("eficiencia_muscular,onset_muscular_ms,");
+        sb.append("eficiencia_muscular,eficiencia_movimiento,");
+        sb.append("onset_emg_fuerza_ms,onset_emg_movimiento_ms,");
 
         // Evaluación clínica
         sb.append("daniels_estimado,daniels_asignado,");
@@ -155,13 +107,25 @@ public class ReporteGenerator {
         // Columnas dinámicas por fase
         for (int i = 1; i <= maxFases; i++) {
             sb.append("fase_").append(i).append("_nombre,");
+            sb.append("fase_").append(i).append("_emg_rms,");
             sb.append("fase_").append(i).append("_emg_mav,");
             sb.append("fase_").append(i).append("_emg_wl,");
-            sb.append("fase_").append(i).append("_emg_orderv,");
-            sb.append("fase_").append(i).append("_emg_rms,");
             sb.append("fase_").append(i).append("_emg_frec_mediana,");
+            sb.append("fase_").append(i).append("_emg_indice_fatiga,");
             sb.append("fase_").append(i).append("_dyn_fuerza_max,");
+            sb.append("fase_").append(i).append("_dyn_tiempo_pico,");
             sb.append("fase_").append(i).append("_dyn_rfd,");
+            sb.append("fase_").append(i).append("_dyn_impulso,");
+            sb.append("fase_").append(i).append("_rom_pitch,");
+            sb.append("fase_").append(i).append("_rom_roll,");
+            sb.append("fase_").append(i).append("_rom_yaw,");
+            sb.append("fase_").append(i).append("_omega_max,");
+            sb.append("fase_").append(i).append("_omega_prom,");
+            sb.append("fase_").append(i).append("_fatiga_mecanica,");
+            sb.append("fase_").append(i).append("_efic_muscular,");
+            sb.append("fase_").append(i).append("_efic_movimiento,");
+            sb.append("fase_").append(i).append("_onset_fuerza,");
+            sb.append("fase_").append(i).append("_onset_movimiento,");
             sb.append("fase_").append(i).append("_daniels");
             if (i < maxFases) sb.append(",");
         }
@@ -169,6 +133,8 @@ public class ReporteGenerator {
 
         // ===== FILAS =====
         for (Ejecucion e : ejecuciones) {
+            if (e.pacienteId == null || e.pacienteId.isEmpty()) continue;
+
             Paciente paciente = mapaPacientes.get(e.pacienteId);
             Prueba   prueba   = mapaPruebas.get(e.pruebaId);
 
@@ -182,13 +148,13 @@ public class ReporteGenerator {
                 sb.append(formatearValor(paciente.peso)).append(",");
                 sb.append(formatearValor(paciente.talla)).append(",");
             } else {
-                sb.append(",,,,,,,,");
+                sb.append(",,,,,,,");
             }
 
             // Perfil clínico del paciente — se carga aparte
             // Por ahora dejamos los campos vacíos si no tenemos el perfil
             // Se puede enriquecer después con PerfilClinico
-            sb.append(",,,,,,,,,");  // 9 campos de perfil clínico
+            sb.append(",,,,,,,,,,,");  // 11 campos de perfil clínico
 
             // Contexto prueba
             if (prueba != null) {
@@ -210,31 +176,30 @@ public class ReporteGenerator {
 
             // Métricas globales EMG
             sb.append(formatearValor(e.rms)).append(",");
-            sb.append(formatearValor(e.emgMAVTotal)).append(",");
-            sb.append(formatearValor(e.emgWLTotal)).append(",");
-            sb.append(formatearValor(e.emgOrderVTotal)).append(",");
-            sb.append(formatearValor(e.var)).append(",");
-            sb.append(e.zc).append(",");
-            sb.append(e.ssc).append(",");
+            sb.append(formatearValor(e.mav)).append(",");
+            sb.append(formatearValor(e.wl)).append(",");
             sb.append(formatearValor(e.frecuenciaMediana)).append(",");
-            sb.append(formatearValor(e.frecuenciaMedia)).append(",");
-            sb.append(formatearValor(e.potenciaTotal)).append(",");
-            sb.append(formatearValor(e.ratioBandas)).append(",");
-            sb.append(formatearValor(e.indiceFatiga)).append(",");
-            sb.append(formatearValor(e.tasaDecaimientoRMS)).append(",");
+            sb.append(formatearValor(e.indiceFatigaEMG)).append(",");
 
             // Métricas globales dinamómetro
             sb.append(formatearValor(e.fuerzaMaxima)).append(",");
-            sb.append(formatearValor(e.fuerzaMinima)).append(",");
-            sb.append(formatearValor(e.dynMAVTotal)).append(",");
             sb.append(formatearValor(e.tiempoHastaPico)).append(",");
             sb.append(formatearValor(e.rfd)).append(",");
             sb.append(formatearValor(e.impulso)).append(",");
-            sb.append(formatearValor(e.coeficienteVariacion)).append(",");
+
+            //Metricas IMU
+            sb.append(formatearValor(e.romPitch)).append(",");
+            sb.append(formatearValor(e.romRoll)).append(",");
+            sb.append(formatearValor(e.romYaw)).append(",");
+            sb.append(formatearValor(e.velocidadAngularMaxima)).append(",");
+            sb.append(formatearValor(e.velocidadAngularPromedio)).append(",");
+            sb.append(formatearValor(e.indiceFatigaMecanica)).append(",");
 
             // Combinadas
-            sb.append(formatearValor(e.eficienciaMusular)).append(",");
-            sb.append(formatearValor(e.onsetMusular)).append(",");
+            sb.append(formatearValor(e.eficienciaMuscular)).append(",");
+            sb.append(formatearValor(e.eficienciaMovimiento)).append(",");
+            sb.append(formatearValor(e.onsetEMGFuerza)).append(",");
+            sb.append(formatearValor(e.onsetEMGMovimiento)).append(",");
 
             // Daniels
             sb.append(formatearValorInt(e.danielsEstimado)).append(",");
@@ -250,15 +215,26 @@ public class ReporteGenerator {
                     Map<String, Float> m = entry.getValue();
 
                     sb.append(escaparCSV(fase)).append(",");
+                    sb.append(formatearValor(getFloatFromMap(m, "emgRMS"))).append(",");
                     sb.append(formatearValor(getFloatFromMap(m, "emgMAV"))).append(",");
                     sb.append(formatearValor(getFloatFromMap(m, "emgWL"))).append(",");
-                    sb.append(formatearValor(getFloatFromMap(m, "emgOrderV"))).append(",");
-                    sb.append(formatearValor(getFloatFromMap(m, "rms"))).append(",");
-                    sb.append(formatearValor(getFloatFromMap(m, "frecuenciaMediana"))).append(",");
-                    sb.append(formatearValor(getFloatFromMap(m, "fuerzaMax"))).append(",");
-                    sb.append(formatearValor(getFloatFromMap(m, "rfd"))).append(",");
-                    sb.append(formatearValorInt(
-                            (int) getFloatFromMap(m, "danielsEstimado")));
+                    sb.append(formatearValor(getFloatFromMap(m, "emgFrecMediana"))).append(",");
+                    sb.append(formatearValor(getFloatFromMap(m, "emgIndiceFatiga"))).append(",");
+                    sb.append(formatearValor(getFloatFromMap(m, "dynFuerzaMax"))).append(",");
+                    sb.append(formatearValor(getFloatFromMap(m, "dynTiempoPico"))).append(",");
+                    sb.append(formatearValor(getFloatFromMap(m, "dynRFD"))).append(",");
+                    sb.append(formatearValor(getFloatFromMap(m, "dynImpulso"))).append(",");
+                    sb.append(formatearValor(getFloatFromMap(m, "romPitch"))).append(",");
+                    sb.append(formatearValor(getFloatFromMap(m, "romRoll"))).append(",");
+                    sb.append(formatearValor(getFloatFromMap(m, "romYaw"))).append(",");
+                    sb.append(formatearValor(getFloatFromMap(m, "omegaMax"))).append(",");
+                    sb.append(formatearValor(getFloatFromMap(m, "omegaProm"))).append(",");
+                    sb.append(formatearValor(getFloatFromMap(m, "fatigaMecanica"))).append(",");
+                    sb.append(formatearValor(getFloatFromMap(m, "eficMuscular"))).append(",");
+                    sb.append(formatearValor(getFloatFromMap(m, "eficMovimiento"))).append(",");
+                    sb.append(formatearValor(getFloatFromMap(m, "onsetFuerza"))).append(",");
+                    sb.append(formatearValor(getFloatFromMap(m, "onsetMovimiento"))).append(",");
+                    sb.append(formatearValorInt((int) getFloatFromMap(m, "danielsEstimado")));
 
                     fasesEscritas++;
                     if (fasesEscritas < maxFases) sb.append(",");
@@ -275,6 +251,8 @@ public class ReporteGenerator {
         }
 
         FileOutputStream fos = new FileOutputStream(salida);
+        // BOM UTF-8 — hace que Excel detecte el encoding correctamente
+        fos.write(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
         fos.write(sb.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
         fos.close();
 
@@ -295,27 +273,6 @@ public class ReporteGenerator {
         return valor == -1 ? "" : String.valueOf(valor);
     }
 
-    private static String construirMetricasEjecucion(Ejecucion e) {
-        if (e == null) {
-            // Todas las columnas vacías
-            return ",,,,,,,,,,,,";
-        }
-        return String.format(Locale.US,
-                "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s",
-                formatearValorInt(e.danielsAsignado),
-                formatearValorInt(e.danielsEstimado),
-                formatearValor(e.rms),
-                formatearValor(e.emgMAVTotal),
-                formatearValor(e.emgWLTotal),
-                formatearValor(e.emgOrderVTotal),
-                formatearValor(e.frecuenciaMediana),
-                formatearValor(e.frecuenciaMedia),
-                formatearValor(e.rfd),
-                formatearValor(e.fuerzaMaxima),
-                formatearValor(e.impulso),
-                formatearValor(e.indiceFatiga),
-                formatearValor(e.eficienciaMusular));
-    }
 
 
     // ================= PDF =================
@@ -335,17 +292,32 @@ public class ReporteGenerator {
             EMGFrequencyAnalyzer analyzer = new EMGFrequencyAnalyzer(1024, 1000);
 
             for (Map.Entry<String, List<MuestraDato>> entry : muestrasPorFase.entrySet()) {
-                String fase             = entry.getKey();
-                List<Float> emg         = new ArrayList<>();
-                List<Float> dynamo      = new ArrayList<>();
+                String fase = entry.getKey();
+                List<Float> emg    = new ArrayList<>();
+                List<Float> dynamo = new ArrayList<>();
+                List<Float> gx     = new ArrayList<>();
+                List<Float> gy     = new ArrayList<>();
+                List<Float> gz     = new ArrayList<>();
+                List<Float> pitch  = new ArrayList<>();
+                List<Float> roll   = new ArrayList<>();
+                List<Float> yaw    = new ArrayList<>();
+
                 for (MuestraDato m : entry.getValue()) {
                     emg.add(m.emg);
                     dynamo.add(m.dinamometro);
+                    gx.add(m.gyroX);
+                    gy.add(m.gyroY);
+                    gz.add(m.gyroZ);
+                    pitch.add(m.pitch);
+                    roll.add(m.roll);
+                    yaw.add(m.yaw);
                 }
+
                 double[] mags = emg.size() >= 1024
                         ? analyzer.computeMagnitudes(emg, 0) : null;
                 MusculoAnalyzer.ResultadoAnalisis r =
-                        MusculoAnalyzer.analizar(emg, dynamo, mags);
+                        MusculoAnalyzer.analizar(emg, dynamo, gx, gy, gz,
+                                pitch, roll, yaw, mags);
                 metricasPorFase.put(fase, new float[]{
                         r.mav, r.wl, r.orderV, r.dynMav});
             }
@@ -443,6 +415,10 @@ public class ReporteGenerator {
 
         return archivo;
     }
+    private static String formatearPDF(float valor) {
+        if (Float.isNaN(valor)) return "—";
+        return String.format(Locale.US, "%.4f", valor);
+    }
     private static void dibujarPortadaHistorial(android.graphics.Canvas canvas,
                                                 Prueba prueba,
                                                 Ejecucion ejecucion) {
@@ -509,27 +485,40 @@ public class ReporteGenerator {
         y += 24;
 
         // Métricas totales
-        canvas.drawText("Métricas totales", margen, y, boldPaint);
-        y += 20;
+        y = dibujarTablaMetricas(canvas, margen, y, new String[][]{
+                {"RMS",           formatearPDF(ejecucion.rms)},
+                {"MAV",           formatearPDF(ejecucion.mav)},
+                {"WL",            formatearPDF(ejecucion.wl)},
+                {"Frec. Mediana", formatearPDF(ejecucion.frecuenciaMediana) + " Hz"},
+                {"Índice Fatiga", formatearPDF(ejecucion.indiceFatigaEMG)},
+        }, "EMG");
+        y += 8;
 
-        canvas.drawRect(margen, y - 14, 595 - margen, y + 4, headerBg);
-        canvas.drawText("MAV EMG",         margen + 4,   y, headerPaint);
-        canvas.drawText("WL EMG",          margen + 130, y, headerPaint);
-        canvas.drawText("OrderV EMG",      margen + 256, y, headerPaint);
-        canvas.drawText("MAV Dinamómetro", margen + 382, y, headerPaint);
-        y += 20;
+        y = dibujarTablaMetricas(canvas, margen, y, new String[][]{
+                {"Fuerza Máx.", formatearPDF(ejecucion.fuerzaMaxima) + " V"},
+                {"T. Pico",     formatearPDF(ejecucion.tiempoHastaPico) + " ms"},
+                {"RFD",         formatearPDF(ejecucion.rfd) + " V/s"},
+                {"Impulso",     formatearPDF(ejecucion.impulso)},
+        }, "Dinamómetro");
+        y += 8;
 
-        rowBg.setColor(android.graphics.Color.rgb(232, 240, 254));
-        canvas.drawRect(margen, y - 14, 595 - margen, y + 4, rowBg);
-        canvas.drawText(String.format(Locale.US, "%.4f", ejecucion.emgMAVTotal),
-                margen + 4, y, bodyPaint);
-        canvas.drawText(String.format(Locale.US, "%.4f", ejecucion.emgWLTotal),
-                margen + 130, y, bodyPaint);
-        canvas.drawText(String.format(Locale.US, "%.4f", ejecucion.emgOrderVTotal),
-                margen + 256, y, bodyPaint);
-        canvas.drawText(String.format(Locale.US, "%.4f", ejecucion.dynMAVTotal),
-                margen + 382, y, bodyPaint);
-        y += 36;
+        y = dibujarTablaMetricas(canvas, margen, y, new String[][]{
+                {"ROM Pitch",   formatearPDF(ejecucion.romPitch) + "°"},
+                {"ROM Roll",    formatearPDF(ejecucion.romRoll) + "°"},
+                {"ROM Yaw",     formatearPDF(ejecucion.romYaw) + "°"},
+                {"ω Máx",       formatearPDF(ejecucion.velocidadAngularMaxima) + " °/s"},
+                {"ω Prom",      formatearPDF(ejecucion.velocidadAngularPromedio) + " °/s"},
+                {"Fatiga Mec.", formatearPDF(ejecucion.indiceFatigaMecanica)},
+        }, "IMU");
+        y += 8;
+
+        y = dibujarTablaMetricas(canvas, margen, y, new String[][]{
+                {"Efic. Muscular",   formatearPDF(ejecucion.eficienciaMuscular)},
+                {"Efic. Movimiento", formatearPDF(ejecucion.eficienciaMovimiento)},
+                {"Onset→Fuerza",     formatearPDF(ejecucion.onsetEMGFuerza) + " ms"},
+                {"Onset→Movim.",     formatearPDF(ejecucion.onsetEMGMovimiento) + " ms"},
+        }, "Fusión");
+        y += 8;
 
         canvas.drawLine(margen, y, 595 - margen, y, linePaint);
         y += 24;
@@ -577,11 +566,11 @@ public class ReporteGenerator {
         }
     }
     private static float getFloatFromMap(Map<String, Float> map, String key) {
-        if (map == null) return 0f;
+        if (map == null) return Float.NaN;
         Object val = map.get(key);
         if (val instanceof Double) return ((Double) val).floatValue();
         if (val instanceof Float)  return (Float) val;
-        return 0f;
+        return Float.NaN;  // ← celda vacía si no encuentra la clave
     }
     public static File exportarPDF(Context context,
                                    Prueba config,
@@ -610,9 +599,22 @@ public class ReporteGenerator {
 
             List<Float> emgFase    = new ArrayList<>();
             List<Float> dynamoFase = new ArrayList<>();
+            List<Float> gxFase     = new ArrayList<>();
+            List<Float> gyFase     = new ArrayList<>();
+            List<Float> gzFase     = new ArrayList<>();
+            List<Float> pitchFase  = new ArrayList<>();
+            List<Float> rollFase   = new ArrayList<>();
+            List<Float> yawFase    = new ArrayList<>();
+
             for (MuestraDato m : datos) {
                 emgFase.add(m.emg);
                 dynamoFase.add(m.dinamometro);
+                gxFase.add(m.gyroX);
+                gyFase.add(m.gyroY);
+                gzFase.add(m.gyroZ);
+                pitchFase.add(m.pitch);
+                rollFase.add(m.roll);
+                yawFase.add(m.yaw);
             }
 
             double[] magnitudes = emgFase.size() >= 1024
@@ -622,7 +624,11 @@ public class ReporteGenerator {
             df.fase        = fase;
             df.numMuestras = datos.size();
             df.metricas    = metricasPorFase.get(fase);
-            df.analisis    = MusculoAnalyzer.analizar(emgFase, dynamoFase, magnitudes);
+            df.analisis    = MusculoAnalyzer.analizar(
+                    emgFase, dynamoFase,
+                    gxFase, gyFase, gzFase,
+                    pitchFase, rollFase, yawFase,
+                    magnitudes);
             df.fftBitmap   = magnitudes != null
                     ? generarBitmapFFT(context, analyzer, emgFase) : null;
 
@@ -724,31 +730,42 @@ public class ReporteGenerator {
         headerBg.setColor(android.graphics.Color.rgb(66, 133, 244));
 
         canvas.drawRect(margen, y - 14, 595 - margen, y + 4, headerBg);
-        canvas.drawText("Fase", margen + 4, y, headerPaint);
-        canvas.drawText("MAV EMG", margen + 120, y, headerPaint);
-        canvas.drawText("WL EMG", margen + 220, y, headerPaint);
-        canvas.drawText("OrderV EMG", margen + 310, y, headerPaint);
-        canvas.drawText("MAV Dinamo", margen + 410, y, headerPaint);
+        canvas.drawText("Fase",       margen + 4,   y, headerPaint);
+        canvas.drawText("RMS",        margen + 110, y, headerPaint);
+        canvas.drawText("MAV",        margen + 180, y, headerPaint);
+        canvas.drawText("Frec.Med",   margen + 250, y, headerPaint);
+        canvas.drawText("F.Máx",      margen + 330, y, headerPaint);
+        canvas.drawText("ROM",        margen + 400, y, headerPaint);
+        canvas.drawText("Daniels",    margen + 470, y, headerPaint);
         y += 20;
 
-        // Filas
         boolean fondo = false;
         Paint rowBg = new Paint();
 
         for (Map.Entry<String, float[]> entry : metricasPorFase.entrySet()) {
-            String fase    = entry.getKey();
-            float[] vals   = entry.getValue();
+            String fase  = entry.getKey();
+            float[] vals = entry.getValue();
+            // vals: [mav, wl, orderV, dynMav, rms, frecMediana, fuerzaMax, romMax, daniels]
 
             rowBg.setColor(fondo
                     ? android.graphics.Color.rgb(232, 240, 254)
                     : android.graphics.Color.WHITE);
             canvas.drawRect(margen, y - 14, 595 - margen, y + 4, rowBg);
 
-            canvas.drawText(fase, margen + 4, y, bodyPaint);
-            canvas.drawText(String.format(Locale.US, "%.4f", vals[0]), margen + 120, y, bodyPaint);
-            canvas.drawText(String.format(Locale.US, "%.4f", vals[1]), margen + 220, y, bodyPaint);
-            canvas.drawText(String.format(Locale.US, "%.4f", vals[2]), margen + 310, y, bodyPaint);
-            canvas.drawText(String.format(Locale.US, "%.4f", vals[3]), margen + 410, y, bodyPaint);
+            canvas.drawText(fase,
+                    margen + 4, y, bodyPaint);
+            canvas.drawText(vals.length > 4 ? formatearPDF(vals[4]) : "—",
+                    margen + 110, y, bodyPaint);
+            canvas.drawText(formatearPDF(vals[0]),
+                    margen + 180, y, bodyPaint);
+            canvas.drawText(vals.length > 5 ? formatearPDF(vals[5]) : "—",
+                    margen + 250, y, bodyPaint);
+            canvas.drawText(vals.length > 6 ? formatearPDF(vals[6]) : "—",
+                    margen + 330, y, bodyPaint);
+            canvas.drawText(vals.length > 7 ? formatearPDF(vals[7]) : "—",
+                    margen + 400, y, bodyPaint);
+            canvas.drawText(vals.length > 8 ? formatearPDF(vals[8]) : "—",
+                    margen + 470, y, bodyPaint);
 
             y += 20;
             fondo = !fondo;
@@ -836,94 +853,40 @@ public class ReporteGenerator {
             canvas.drawText("Análisis muscular", margen, y, boldPaint);
             y += 16;
 
-            // Fila 1: EMG tiempo
-            canvas.drawRect(margen, y - 12, 595 - margen, y + 4, headerBg);
-            canvas.drawText("RMS", margen + 4, y, headerPaint);
-            canvas.drawText("Varianza", margen + 90, y, headerPaint);
-            canvas.drawText("ZC", margen + 190, y, headerPaint);
-            canvas.drawText("SSC", margen + 260, y, headerPaint);
-            canvas.drawText("Frec. Mediana", margen + 330, y, headerPaint);
-            canvas.drawText("Frec. Media", margen + 440, y, headerPaint);
-            y += 16;
+            y = dibujarTablaMetricas(canvas, margen, y, new String[][]{
+                    {"RMS",           formatearPDF(df.analisis.rms)},
+                    {"MAV",           formatearPDF(df.analisis.mav)},
+                    {"WL",            formatearPDF(df.analisis.wl)},
+                    {"Frec. Mediana", formatearPDF(df.analisis.frecuenciaMediana) + " Hz"},
+                    {"Índice Fatiga", formatearPDF(df.analisis.indiceFatigaEMG)},
+            }, "EMG");
+            y += 8;
 
-            rowBg.setColor(android.graphics.Color.rgb(232, 240, 254));
-            canvas.drawRect(margen, y - 12, 595 - margen, y + 4, rowBg);
-            canvas.drawText(String.format(Locale.US, "%.4f", df.analisis.rms),
-                    margen + 4, y, bodyPaint);
-            canvas.drawText(String.format(Locale.US, "%.4f", df.analisis.var),
-                    margen + 90, y, bodyPaint);
-            canvas.drawText(String.valueOf(df.analisis.zc),
-                    margen + 190, y, bodyPaint);
-            canvas.drawText(String.valueOf(df.analisis.ssc),
-                    margen + 260, y, bodyPaint);
-            canvas.drawText(String.format(Locale.US, "%.1f Hz",
-                    df.analisis.frecuenciaMediana), margen + 330, y, bodyPaint);
-            canvas.drawText(String.format(Locale.US, "%.1f Hz",
-                    df.analisis.frecuenciaMedia), margen + 440, y, bodyPaint);
-            y += 20;
+            y = dibujarTablaMetricas(canvas, margen, y, new String[][]{
+                    {"Fuerza Máx.", formatearPDF(df.analisis.fuerzaMaxima) + " V"},
+                    {"T. Pico",     formatearPDF(df.analisis.tiempoHastaPico) + " ms"},
+                    {"RFD",         formatearPDF(df.analisis.rfd) + " V/s"},
+                    {"Impulso",     formatearPDF(df.analisis.impulso)},
+            }, "Dinamómetro");
+            y += 8;
 
-            // Fila 2: Dinamómetro
-            canvas.drawRect(margen, y - 12, 595 - margen, y + 4, headerBg);
-            canvas.drawText("F. Máx", margen + 4, y, headerPaint);
-            canvas.drawText("F. Mín", margen + 90, y, headerPaint);
-            canvas.drawText("T. Pico (ms)", margen + 190, y, headerPaint);
-            canvas.drawText("RFD (V/s)", margen + 300, y, headerPaint);
-            canvas.drawText("Impulso", margen + 390, y, headerPaint);
-            canvas.drawText("CV (%)", margen + 470, y, headerPaint);
-            y += 16;
+            y = dibujarTablaMetricas(canvas, margen, y, new String[][]{
+                    {"ROM Pitch",   formatearPDF(df.analisis.romPitch) + "°"},
+                    {"ROM Roll",    formatearPDF(df.analisis.romRoll) + "°"},
+                    {"ROM Yaw",     formatearPDF(df.analisis.romYaw) + "°"},
+                    {"ω Máx",       formatearPDF(df.analisis.velocidadAngularMaxima) + " °/s"},
+                    {"ω Prom",      formatearPDF(df.analisis.velocidadAngularPromedio) + " °/s"},
+                    {"Fatiga Mec.", formatearPDF(df.analisis.indiceFatigaMecanica)},
+            }, "IMU");
+            y += 8;
 
-            rowBg.setColor(android.graphics.Color.WHITE);
-            canvas.drawRect(margen, y - 12, 595 - margen, y + 4, rowBg);
-            canvas.drawText(String.format(Locale.US, "%.4f", df.analisis.fuerzaMaxima),
-                    margen + 4, y, bodyPaint);
-            canvas.drawText(String.format(Locale.US, "%.4f", df.analisis.fuerzaMinima),
-                    margen + 90, y, bodyPaint);
-            canvas.drawText(String.format(Locale.US, "%.0f", df.analisis.tiempoHastaPico),
-                    margen + 190, y, bodyPaint);
-            canvas.drawText(String.format(Locale.US, "%.2f", df.analisis.rfd),
-                    margen + 300, y, bodyPaint);
-            canvas.drawText(String.format(Locale.US, "%.4f", df.analisis.impulso),
-                    margen + 390, y, bodyPaint);
-            canvas.drawText(String.format(Locale.US, "%.1f", df.analisis.coeficienteVariacion),
-                    margen + 470, y, bodyPaint);
-            y += 20;
-
-            // Fila 3: Combinados y fatiga
-            canvas.drawRect(margen, y - 12, 595 - margen, y + 4, headerBg);
-            canvas.drawText("Eficiencia", margen + 4, y, headerPaint);
-            canvas.drawText("Onset (ms)", margen + 120, y, headerPaint);
-            canvas.drawText("Índice fatiga", margen + 240, y, headerPaint);
-            canvas.drawText("Decaim. RMS", margen + 360, y, headerPaint);
-            canvas.drawText("Ratio bandas", margen + 460, y, headerPaint);
-            y += 16;
-
-            rowBg.setColor(android.graphics.Color.rgb(232, 240, 254));
-            canvas.drawRect(margen, y - 12, 595 - margen, y + 4, rowBg);
-            canvas.drawText(String.format(Locale.US, "%.4f", df.analisis.eficienciaMusular),
-                    margen + 4, y, bodyPaint);
-            canvas.drawText(String.format(Locale.US, "%.0f", df.analisis.onsetMusular),
-                    margen + 120, y, bodyPaint);
-            canvas.drawText(String.format(Locale.US, "%.4f", df.analisis.indiceFatiga),
-                    margen + 240, y, bodyPaint);
-            canvas.drawText(String.format(Locale.US, "%.4f", df.analisis.tasaDecaimientoRMS),
-                    margen + 360, y, bodyPaint);
-            canvas.drawText(String.format(Locale.US, "%.4f", df.analisis.ratioBandas),
-                    margen + 460, y, bodyPaint);
-            y += 20;
-
-            // Daniels
-            canvas.drawLine(margen, y, 595 - margen, y, linePaint);
-            y += 12;
-
-            Paint danielsPaint = new Paint();
-            danielsPaint.setTextSize(13f);
-            danielsPaint.setFakeBoldText(true);
-            danielsPaint.setColor(android.graphics.Color.rgb(66, 133, 244));
-
-            canvas.drawText("Escala de Daniels estimada: "
-                            + df.analisis.danielsEstimado + " / 5",
-                    margen, y, danielsPaint);
-            y += 20;
+            y = dibujarTablaMetricas(canvas, margen, y, new String[][]{
+                    {"Efic. Muscular",   formatearPDF(df.analisis.eficienciaMuscular)},
+                    {"Efic. Movimiento", formatearPDF(df.analisis.eficienciaMovimiento)},
+                    {"Onset→Fuerza",     formatearPDF(df.analisis.onsetEMGFuerza) + " ms"},
+                    {"Onset→Movim.",     formatearPDF(df.analisis.onsetEMGMovimiento) + " ms"},
+            }, "Fusión");
+            y += 8;
         }
 
         // ===== FFT =====
@@ -948,6 +911,43 @@ public class ReporteGenerator {
             canvas.drawText("Datos insuficientes para FFT (mínimo 1024 muestras)",
                     margen, y, grayPaint);
         }
+    }
+
+    private static int dibujarTablaMetricas(android.graphics.Canvas canvas,
+                                            int margen, int y,
+                                            String[][] filas,
+                                            String titulo) {
+        Paint titlePaint = new Paint();
+        titlePaint.setTextSize(11f);
+        titlePaint.setFakeBoldText(true);
+        titlePaint.setColor(android.graphics.Color.WHITE);
+
+        Paint bodyPaint = new Paint();
+        bodyPaint.setTextSize(10f);
+        bodyPaint.setColor(android.graphics.Color.BLACK);
+
+        Paint headerBg = new Paint();
+        headerBg.setColor(android.graphics.Color.rgb(66, 133, 244));
+
+        Paint rowBg = new Paint();
+
+        // Header
+        canvas.drawRect(margen, y - 12, 595 - margen, y + 4, headerBg);
+        canvas.drawText(titulo, margen + 4, y, titlePaint);
+        y += 16;
+
+        boolean fondo = false;
+        for (String[] fila : filas) {
+            rowBg.setColor(fondo
+                    ? android.graphics.Color.rgb(232, 240, 254)
+                    : android.graphics.Color.WHITE);
+            canvas.drawRect(margen, y - 12, 595 - margen, y + 4, rowBg);
+            canvas.drawText(fila[0], margen + 4, y, bodyPaint);
+            canvas.drawText(fila[1], margen + 200, y, bodyPaint);
+            y += 16;
+            fondo = !fondo;
+        }
+        return y;
     }
 
 // ===== GENERAR BITMAP FFT =====
@@ -1230,8 +1230,10 @@ public class ReporteGenerator {
                 String[] cols = linea.split(",");
                 if (cols.length < 3) continue;
 
-                String fase = cols[1];
-                float emg   = Float.parseFloat(cols[2]);
+                String fase = cols[8].trim();
+                String emgStr = cols[10].trim();
+                if (emgStr.isEmpty()) continue; // NaN guardado como celda vacía
+                float emg = Float.parseFloat(emgStr);
 
                 if (!emgPorFase.containsKey(fase)) {
                     emgPorFase.put(fase, new ArrayList<>());

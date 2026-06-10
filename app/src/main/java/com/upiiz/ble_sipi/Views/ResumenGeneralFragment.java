@@ -49,38 +49,40 @@ public class ResumenGeneralFragment extends Fragment {
     }
 
     private void llenarDatos(View v) {
-        // Métricas básicas
-        if (metricasBasicas != null) {
-            setText(v, R.id.tvMAV,    "%.4f", metricasBasicas[0]);
-            setText(v, R.id.tvWL,     "%.4f", metricasBasicas[1]);
-            setText(v, R.id.tvOrderV, "%.4f", metricasBasicas[2]);
-            setText(v, R.id.tvDynMAV, "%.4f", metricasBasicas[3]);
-        }
-
         if (analisis == null) return;
 
-        // Análisis muscular
-        setText(v, R.id.tvRMS,          "%.4f", analisis.rms);
-        setText(v, R.id.tvVar,          "%.4f", analisis.var);
-        setTextInt(v, R.id.tvZC,        analisis.zc);
-        setTextInt(v, R.id.tvSSC,       analisis.ssc);
-        setText(v, R.id.tvFrecMediana,  "%.1f Hz", analisis.frecuenciaMediana);
-        setText(v, R.id.tvFrecMedia,    "%.1f Hz", analisis.frecuenciaMedia);
-        setText(v, R.id.tvPotencia,     "%.2f", analisis.potenciaTotal);
-        setText(v, R.id.tvRatioBandas,  "%.4f", analisis.ratioBandas);
-        setText(v, R.id.tvFuerzaMax,    "%.4f V", analisis.fuerzaMaxima);
+        // EMG
+        setText(v, R.id.tvRMS,           "%.4f",    analisis.rms);
+        setText(v, R.id.tvMAV,           "%.4f",    analisis.mav);
+        setText(v, R.id.tvWL,            "%.4f",    analisis.wl);
+        setText(v, R.id.tvFrecMediana,   "%.1f Hz", analisis.frecuenciaMediana);
+        setText(v, R.id.tvIndiceFatiga,  "%.4f",    analisis.indiceFatigaEMG);
+
+        // Dinamómetro
+        setText(v, R.id.tvFuerzaMax,     "%.4f V",  analisis.fuerzaMaxima);
+        setText(v, R.id.tvTiempoPico,    "%.0f ms", analisis.tiempoHastaPico);
         setText(v, R.id.tvRFD,          "%.2f V/s", analisis.rfd);
-        setText(v, R.id.tvTiempoPico,   "%.0f ms", analisis.tiempoHastaPico);
-        setText(v, R.id.tvImpulso,      "%.4f", analisis.impulso);
-        setText(v, R.id.tvEficiencia,   "%.4f", analisis.eficienciaMusular);
-        setText(v, R.id.tvOnset,        "%.0f ms", analisis.onsetMusular);
-        setText(v, R.id.tvIndiceFatiga, "%.4f", analisis.indiceFatiga);
-        setText(v, R.id.tvCV,           "%.1f%%", analisis.coeficienteVariacion);
+        setText(v, R.id.tvImpulso,       "%.4f",    analisis.impulso);
+
+        // IMU
+        setText(v, R.id.tvRomPitch,      "%.1f°",   analisis.romPitch);
+        setText(v, R.id.tvRomRoll,       "%.1f°",   analisis.romRoll);
+        setText(v, R.id.tvRomYaw,        "%.1f°",   analisis.romYaw);
+        setText(v, R.id.tvOmegaMax,      "%.1f °/s", analisis.velocidadAngularMaxima);
+        setText(v, R.id.tvOmegaProm,     "%.1f °/s", analisis.velocidadAngularPromedio);
+        setText(v, R.id.tvFatigaMec,     "%.4f",    analisis.indiceFatigaMecanica);
+
+        // Fusión
+        setText(v, R.id.tvEficMuscular,  "%.4f",    analisis.eficienciaMuscular);
+        setText(v, R.id.tvEficMov,       "%.4f",    analisis.eficienciaMovimiento);
+        setText(v, R.id.tvOnsetFuerza,   "%.0f ms", analisis.onsetEMGFuerza);
+        setText(v, R.id.tvOnsetMov,      "%.0f ms", analisis.onsetEMGMovimiento);
 
         // Daniels
         TextView tvDaniels = v.findViewById(R.id.tvDanielsEstimado);
         if (tvDaniels != null)
             tvDaniels.setText(String.valueOf(analisis.danielsEstimado));
+
 
         // Botón guardar Daniels
         MaterialButton btnGuardar = v.findViewById(R.id.btnGuardarDaniels);

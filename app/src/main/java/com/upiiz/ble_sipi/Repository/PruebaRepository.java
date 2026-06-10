@@ -160,35 +160,37 @@ public class PruebaRepository {
 
     private Map<String, Object> ejecucionToMap(Ejecucion e) {
         Map<String, Object> map = new HashMap<>();
-        map.put("duracionReal",    e.duracionReal);
-        map.put("pacienteId", e.pacienteId);
-        map.put("totalMuestras",   e.totalMuestras);
-        map.put("emgMAVTotal",     e.emgMAVTotal);
-        map.put("emgWLTotal",      e.emgWLTotal);
-        map.put("emgOrderVTotal",  e.emgOrderVTotal);
-        map.put("dynMAVTotal",     e.dynMAVTotal);
-        map.put("metricasPorFase", e.metricasPorFase);
-        map.put("fechaEjecucion", System.currentTimeMillis());
-        map.put("rms",                 e.rms);
-        map.put("var",                 e.var);
-        map.put("zc",                  e.zc);
-        map.put("ssc",                 e.ssc);
-        map.put("frecuenciaMediana",   e.frecuenciaMediana);
-        map.put("frecuenciaMedia",     e.frecuenciaMedia);
-        map.put("potenciaTotal",       e.potenciaTotal);
-        map.put("ratioBandas",         e.ratioBandas);
-        map.put("indiceFatiga",        e.indiceFatiga);
-        map.put("tasaDecaimientoRMS",  e.tasaDecaimientoRMS);
-        map.put("fuerzaMaxima",        e.fuerzaMaxima);
-        map.put("fuerzaMinima",        e.fuerzaMinima);
-        map.put("tiempoHastaPico",     e.tiempoHastaPico);
-        map.put("rfd",                 e.rfd);
-        map.put("impulso",             e.impulso);
-        map.put("coeficienteVariacion", e.coeficienteVariacion);
-        map.put("eficienciaMusular",   e.eficienciaMusular);
-        map.put("onsetMusular",        e.onsetMusular);
-        map.put("danielsEstimado",     e.danielsEstimado);
-        map.put("danielsAsignado",     e.danielsAsignado);
+        // EMG
+        map.put("rms",                  e.rms);
+        map.put("mav",                  e.mav);
+        map.put("wl",                   e.wl);
+        map.put("frecuenciaMediana",    e.frecuenciaMediana);
+        map.put("indiceFatigaEMG",      e.indiceFatigaEMG);
+        // Dinamómetro
+        map.put("fuerzaMaxima",         e.fuerzaMaxima);
+        map.put("tiempoHastaPico",      e.tiempoHastaPico);
+        map.put("rfd",                  e.rfd);
+        map.put("impulso",              e.impulso);
+        // IMU
+        map.put("romPitch",             e.romPitch);
+        map.put("romRoll",              e.romRoll);
+        map.put("romYaw",               e.romYaw);
+        map.put("velocidadAngularMaxima",   e.velocidadAngularMaxima);
+        map.put("velocidadAngularPromedio", e.velocidadAngularPromedio);
+        map.put("indiceFatigaMecanica", e.indiceFatigaMecanica);
+        // Fusión
+        map.put("eficienciaMuscular",   e.eficienciaMuscular);
+        map.put("eficienciaMovimiento", e.eficienciaMovimiento);
+        map.put("onsetEMGFuerza",       e.onsetEMGFuerza);
+        map.put("onsetEMGMovimiento",   e.onsetEMGMovimiento);
+        // Daniels
+        map.put("danielsEstimado",      e.danielsEstimado);
+        map.put("danielsAsignado",      e.danielsAsignado);
+        // Básicas
+        map.put("emgMAVTotal",          e.emgMAVTotal);
+        map.put("emgWLTotal",           e.emgWLTotal);
+        map.put("emgOrderVTotal",       e.emgOrderVTotal);
+        map.put("dynMAVTotal",          e.dynMAVTotal);
         return map;
     }
     private long toLong(Object o) {
@@ -203,36 +205,31 @@ public class PruebaRepository {
     @SuppressWarnings("unchecked")
     private Ejecucion mapToEjecucion(String id, Map<String, Object> map) {
         Ejecucion e = new Ejecucion();
-        e.id              = id;
-        e.pacienteId = (String) map.get("pacienteId");
-        e.pruebaId        = (String)    map.get("pruebaId");
-        e.fechaEjecucion = toLong(map.get("fechaEjecucion"));
-        e.duracionReal    = toInt(map.get("duracionReal"));
-        e.totalMuestras   = toInt(map.get("totalMuestras"));
-        e.emgMAVTotal     = toFloat(map.get("emgMAVTotal"));
-        e.emgWLTotal      = toFloat(map.get("emgWLTotal"));
-        e.emgOrderVTotal  = toFloat(map.get("emgOrderVTotal"));
-        e.dynMAVTotal     = toFloat(map.get("dynMAVTotal"));
-        e.rms                = toFloat(map.get("rms"));
-        e.var                = toFloat(map.get("var"));
-        e.zc                 = toInt(map.get("zc"));
-        e.ssc                = toInt(map.get("ssc"));
-        e.frecuenciaMediana  = toFloat(map.get("frecuenciaMediana"));
-        e.frecuenciaMedia    = toFloat(map.get("frecuenciaMedia"));
-        e.potenciaTotal      = toFloat(map.get("potenciaTotal"));
-        e.ratioBandas        = toFloat(map.get("ratioBandas"));
-        e.indiceFatiga       = toFloat(map.get("indiceFatiga"));
-        e.tasaDecaimientoRMS = toFloat(map.get("tasaDecaimientoRMS"));
-        e.fuerzaMaxima       = toFloat(map.get("fuerzaMaxima"));
-        e.fuerzaMinima       = toFloat(map.get("fuerzaMinima"));
-        e.tiempoHastaPico    = toFloat(map.get("tiempoHastaPico"));
-        e.rfd                = toFloat(map.get("rfd"));
-        e.impulso            = toFloat(map.get("impulso"));
-        e.coeficienteVariacion = toFloat(map.get("coeficienteVariacion"));
-        e.eficienciaMusular  = toFloat(map.get("eficienciaMusular"));
-        e.onsetMusular       = toFloat(map.get("onsetMusular"));
-        e.danielsEstimado    = toInt(map.get("danielsEstimado"));
-        e.danielsAsignado    = toInt(map.get("danielsAsignado"));
+        e.rms                    = toFloat(map.get("rms"));
+        e.mav                    = toFloat(map.get("mav"));
+        e.wl                     = toFloat(map.get("wl"));
+        e.frecuenciaMediana      = toFloat(map.get("frecuenciaMediana"));
+        e.indiceFatigaEMG        = toFloat(map.get("indiceFatigaEMG"));
+        e.fuerzaMaxima           = toFloat(map.get("fuerzaMaxima"));
+        e.tiempoHastaPico        = toFloat(map.get("tiempoHastaPico"));
+        e.rfd                    = toFloat(map.get("rfd"));
+        e.impulso                = toFloat(map.get("impulso"));
+        e.romPitch               = toFloat(map.get("romPitch"));
+        e.romRoll                = toFloat(map.get("romRoll"));
+        e.romYaw                 = toFloat(map.get("romYaw"));
+        e.velocidadAngularMaxima   = toFloat(map.get("velocidadAngularMaxima"));
+        e.velocidadAngularPromedio = toFloat(map.get("velocidadAngularPromedio"));
+        e.indiceFatigaMecanica   = toFloat(map.get("indiceFatigaMecanica"));
+        e.eficienciaMuscular     = toFloat(map.get("eficienciaMuscular"));
+        e.eficienciaMovimiento   = toFloat(map.get("eficienciaMovimiento"));
+        e.onsetEMGFuerza         = toFloat(map.get("onsetEMGFuerza"));
+        e.onsetEMGMovimiento     = toFloat(map.get("onsetEMGMovimiento"));
+        e.danielsEstimado        = toInt(map.get("danielsEstimado"));
+        e.danielsAsignado        = toInt(map.get("danielsAsignado"));
+        e.emgMAVTotal            = toFloat(map.get("emgMAVTotal"));
+        e.emgWLTotal             = toFloat(map.get("emgWLTotal"));
+        e.emgOrderVTotal         = toFloat(map.get("emgOrderVTotal"));
+        e.dynMAVTotal            = toFloat(map.get("dynMAVTotal"));
         @SuppressWarnings("unchecked")
         Map<String, Map<String, Object>> metricasRaw =
                 (Map<String, Map<String, Object>>) map.get("metricasPorFase");

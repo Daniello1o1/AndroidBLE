@@ -25,27 +25,37 @@ public class Ejecucion implements Serializable {
 
     // Metricas GOD
 
-    // Análisis completo
+    // EMG
     public float rms;
-    public float var;
-    public int   zc;
-    public int   ssc;
+    public float mav;
+    public float wl;
     public float frecuenciaMediana;
-    public float frecuenciaMedia;
-    public float potenciaTotal;
-    public float ratioBandas;
-    public float indiceFatiga;
-    public float tasaDecaimientoRMS;
+    public float indiceFatigaEMG;
+
+    // Dinamómetro
     public float fuerzaMaxima;
-    public float fuerzaMinima;
     public float tiempoHastaPico;
     public float rfd;
     public float impulso;
-    public float coeficienteVariacion;
-    public float eficienciaMusular;
-    public float onsetMusular;
-    public int   danielsEstimado;
-    public int   danielsAsignado; // asignado por el médico
+
+    // IMU
+    public float romPitch;
+    public float romRoll;
+    public float romYaw;
+    public float velocidadAngularMaxima;
+    public float velocidadAngularPromedio;
+    public float indiceFatigaMecanica;
+
+    // Fusión
+    public float eficienciaMuscular;
+    public float eficienciaMovimiento;
+    public float onsetEMGFuerza;
+    public float onsetEMGMovimiento;
+
+    // Daniels
+    public int danielsEstimado;
+    public int danielsAsignado;
+
 
     public Ejecucion() {}
 }

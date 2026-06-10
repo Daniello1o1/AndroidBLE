@@ -3,34 +3,30 @@ package com.upiiz.ble_sipi.Views;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
+import com.upiiz.ble_sipi.Models.Ejecucion;
+import com.upiiz.ble_sipi.Models.MuestraDato;
+import com.upiiz.ble_sipi.Models.Prueba;
 import com.upiiz.ble_sipi.R;
 import com.upiiz.ble_sipi.Tools.EMGFrequencyAnalyzer;
+import com.upiiz.ble_sipi.Tools.MusculoAnalyzer;
 import com.upiiz.ble_sipi.Tools.ReporteGenerator;
-import com.upiiz.ble_sipi.Models.Ejecucion;
-import com.upiiz.ble_sipi.Models.Prueba;
-
-import android.graphics.Color;
-import android.widget.Toast;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -40,6 +36,13 @@ public class ResumenHistorialActivity extends AppCompatActivity {
     private Prueba prueba;
     private Ejecucion ejecucion;
     private boolean tieneCSVLocal;
+
+    // Resultados calculados desde CSV local
+    private Map<String, float[]> metricasPorFase;
+    private Map<String, MusculoAnalyzer.ResultadoAnalisis> analisisPorFase;
+    private MusculoAnalyzer.ResultadoAnalisis analisisGlobal;
+    private float[] metricasGlobales;
+    private List<String> fases = new ArrayList<>();
 
     private static final int SAMPLE_RATE = 1000;
 
@@ -51,21 +54,242 @@ public class ResumenHistorialActivity extends AppCompatActivity {
         prueba    = (Prueba)    getIntent().getSerializableExtra("prueba");
         ejecucion = (Ejecucion) getIntent().getSerializableExtra("ejecucion");
 
-        // Verificar si existe CSV local
         tieneCSVLocal = ReporteGenerator.existeCSVLocal(
                 this, prueba.id, ejecucion.id);
 
-        if (!tieneCSVLocal) {
-            // Intentar descargar de Storage
+        configurarHeader();
+
+        if (tieneCSVLocal) {
+            calcularDesdeCSV();
+            configurarTabs();
+        } else {
             descargarCSVSiDisponible();
+            calcularDesdeFirestore();
+            configurarTabs();
         }
 
-        configurarHeader();
-        construirTarjetasPorFase();
 
-        // Ocultar exportar CSV/PDF — no aplica desde historial
         MaterialButton btnPDF = findViewById(R.id.btnExportarPDF);
-        btnPDF.setOnClickListener(v -> exportarPDFHistorial());
+        if (btnPDF != null) btnPDF.setOnClickListener(v -> exportarPDFHistorial());
+    }
+
+    // ===== CALCULAR =====
+
+    private void calcularDesdeCSV() {
+        List<MuestraDato> muestras = ReporteGenerator.leerMuestrasCompletas(
+                this, prueba.id, ejecucion.id);
+        if (muestras == null || muestras.isEmpty()) {
+            calcularDesdeFirestore();
+            return;
+        }
+
+        metricasPorFase = new LinkedHashMap<>();
+        analisisPorFase = new LinkedHashMap<>();
+
+        Map<String, List<MuestraDato>> muestrasPorFase =
+                ReporteGenerator.agruparPorFase(muestras);
+        EMGFrequencyAnalyzer analyzer = new EMGFrequencyAnalyzer(1024, SAMPLE_RATE);
+
+        for (Map.Entry<String, List<MuestraDato>> entry : muestrasPorFase.entrySet()) {
+            String fase             = entry.getKey();
+            List<MuestraDato> datos = entry.getValue();
+            fases.add(fase);
+
+            List<Float> emg    = new ArrayList<>();
+            List<Float> dynamo = new ArrayList<>();
+            List<Float> gx     = new ArrayList<>();
+            List<Float> gy     = new ArrayList<>();
+            List<Float> gz     = new ArrayList<>();
+            List<Float> pitch  = new ArrayList<>();
+            List<Float> roll   = new ArrayList<>();
+            List<Float> yaw    = new ArrayList<>();
+
+            for (MuestraDato m : datos) {
+                emg.add(m.emg);    dynamo.add(m.dinamometro);
+                gx.add(m.gyroX);   gy.add(m.gyroY);   gz.add(m.gyroZ);
+                pitch.add(m.pitch); roll.add(m.roll);   yaw.add(m.yaw);
+            }
+
+            double[] mags = emg.size() >= 1024
+                    ? analyzer.computeMagnitudes(emg, 0) : null;
+
+            MusculoAnalyzer.ResultadoAnalisis r =
+                    MusculoAnalyzer.analizar(emg, dynamo, gx, gy, gz,
+                            pitch, roll, yaw, mags);
+
+            analisisPorFase.put(fase, r);
+            metricasPorFase.put(fase, new float[]{
+                    r.mav, r.wl, r.orderV, r.dynMav,
+                    r.rms, r.frecuenciaMediana, r.fuerzaMaxima,
+                    calcularROMMax(r), r.danielsEstimado});
+        }
+
+        // Global
+        List<Float> emgTotal = new ArrayList<>();
+        List<Float> dynTotal = new ArrayList<>();
+        List<Float> gxT = new ArrayList<>(), gyT = new ArrayList<>(), gzT = new ArrayList<>();
+        List<Float> pT  = new ArrayList<>(), rT  = new ArrayList<>(), yT  = new ArrayList<>();
+
+        for (MuestraDato m : muestras) {
+            emgTotal.add(m.emg);    dynTotal.add(m.dinamometro);
+            gxT.add(m.gyroX);       gyT.add(m.gyroY);      gzT.add(m.gyroZ);
+            pT.add(m.pitch);        rT.add(m.roll);         yT.add(m.yaw);
+        }
+
+        double[] magsG = emgTotal.size() >= 1024
+                ? analyzer.computeMagnitudes(emgTotal, 0) : null;
+        analisisGlobal = MusculoAnalyzer.analizar(
+                emgTotal, dynTotal, gxT, gyT, gzT, pT, rT, yT, magsG);
+        metricasGlobales = new float[]{
+                analisisGlobal.mav, analisisGlobal.wl,
+                analisisGlobal.orderV, analisisGlobal.dynMav,
+                analisisGlobal.rms, analisisGlobal.frecuenciaMediana,
+                analisisGlobal.fuerzaMaxima,
+                calcularROMMax(analisisGlobal), analisisGlobal.danielsEstimado};
+    }
+
+    private void calcularDesdeFirestore() {
+        // Sin CSV — usar métricas de Firestore para mostrar lo que hay
+        fases.clear();
+        metricasPorFase  = new LinkedHashMap<>();
+        analisisPorFase  = new LinkedHashMap<>();
+
+        if (ejecucion.metricasPorFase != null) {
+            for (Map.Entry<String, Map<String, Float>> entry
+                    : ejecucion.metricasPorFase.entrySet()) {
+                String fase          = entry.getKey();
+                Map<String, Float> m = entry.getValue();
+                fases.add(fase);
+
+                // Crear ResultadoAnalisis parcial desde Firestore
+                MusculoAnalyzer.ResultadoAnalisis r =
+                        new MusculoAnalyzer.ResultadoAnalisis();
+                r.rms              = getFloat(m, "emgRMS");
+                r.mav              = getFloat(m, "emgMAV");
+                r.wl               = getFloat(m, "emgWL");
+                r.frecuenciaMediana = getFloat(m, "emgFrecMediana");
+                r.indiceFatigaEMG  = getFloat(m, "emgIndiceFatiga");
+                r.fuerzaMaxima     = getFloat(m, "dynFuerzaMax");
+                r.tiempoHastaPico  = getFloat(m, "dynTiempoPico");
+                r.rfd              = getFloat(m, "dynRFD");
+                r.impulso          = getFloat(m, "dynImpulso");
+                r.romPitch         = getFloat(m, "romPitch");
+                r.romRoll          = getFloat(m, "romRoll");
+                r.romYaw           = getFloat(m, "romYaw");
+                r.velocidadAngularMaxima   = getFloat(m, "omegaMax");
+                r.velocidadAngularPromedio = getFloat(m, "omegaProm");
+                r.indiceFatigaMecanica     = getFloat(m, "fatigaMecanica");
+                r.eficienciaMuscular  = getFloat(m, "eficMuscular");
+                r.eficienciaMovimiento = getFloat(m, "eficMovimiento");
+                r.onsetEMGFuerza      = getFloat(m, "onsetFuerza");
+                r.onsetEMGMovimiento  = getFloat(m, "onsetMovimiento");
+                r.danielsEstimado     = (int) getFloat(m, "danielsEstimado");
+                r.dynMav = r.mav;
+                r.orderV = Float.NaN;
+
+                analisisPorFase.put(fase, r);
+                metricasPorFase.put(fase, new float[]{
+                        r.mav, r.wl, r.orderV, r.dynMav,
+                        r.rms, r.frecuenciaMediana, r.fuerzaMaxima,
+                        calcularROMMax(r), r.danielsEstimado});
+            }
+        }
+
+        // Global desde Firestore
+        analisisGlobal = new MusculoAnalyzer.ResultadoAnalisis();
+        analisisGlobal.rms               = ejecucion.rms;
+        analisisGlobal.mav               = ejecucion.mav;
+        analisisGlobal.wl                = ejecucion.wl;
+        analisisGlobal.frecuenciaMediana = ejecucion.frecuenciaMediana;
+        analisisGlobal.indiceFatigaEMG   = ejecucion.indiceFatigaEMG;
+        analisisGlobal.fuerzaMaxima      = ejecucion.fuerzaMaxima;
+        analisisGlobal.tiempoHastaPico   = ejecucion.tiempoHastaPico;
+        analisisGlobal.rfd               = ejecucion.rfd;
+        analisisGlobal.impulso           = ejecucion.impulso;
+        analisisGlobal.romPitch          = ejecucion.romPitch;
+        analisisGlobal.romRoll           = ejecucion.romRoll;
+        analisisGlobal.romYaw            = ejecucion.romYaw;
+        analisisGlobal.velocidadAngularMaxima   = ejecucion.velocidadAngularMaxima;
+        analisisGlobal.velocidadAngularPromedio = ejecucion.velocidadAngularPromedio;
+        analisisGlobal.indiceFatigaMecanica     = ejecucion.indiceFatigaMecanica;
+        analisisGlobal.eficienciaMuscular  = ejecucion.eficienciaMuscular;
+        analisisGlobal.eficienciaMovimiento = ejecucion.eficienciaMovimiento;
+        analisisGlobal.onsetEMGFuerza      = ejecucion.onsetEMGFuerza;
+        analisisGlobal.onsetEMGMovimiento  = ejecucion.onsetEMGMovimiento;
+        analisisGlobal.danielsEstimado     = ejecucion.danielsEstimado;
+        analisisGlobal.danielsAsignado     = ejecucion.danielsAsignado;
+        analisisGlobal.dynMav              = ejecucion.dynMAVTotal;
+
+        metricasGlobales = new float[]{
+                analisisGlobal.mav, analisisGlobal.wl,
+                Float.NaN, analisisGlobal.dynMav,
+                analisisGlobal.rms, analisisGlobal.frecuenciaMediana,
+                analisisGlobal.fuerzaMaxima,
+                calcularROMMax(analisisGlobal), analisisGlobal.danielsEstimado};
+    }
+
+    // ===== TABS =====
+
+    private void configurarTabs() {
+        ViewPager2 viewPager = findViewById(R.id.viewPager);
+        TabLayout tabLayout  = findViewById(R.id.tabLayout);
+
+        viewPager.setAdapter(new FragmentStateAdapter(this) {
+            @Override
+            public int getItemCount() {
+                return 1 + fases.size();
+            }
+
+            @Override
+            public Fragment createFragment(int position) {
+                if (position == 0) {
+                    return ResumenGeneralFragment.newInstance(
+                            analisisGlobal,
+                            metricasGlobales,
+                            grado -> {
+                                // Desde historial no se actualiza Daniels
+                                Toast.makeText(ResumenHistorialActivity.this,
+                                        "No se puede actualizar Daniels desde el historial",
+                                        Toast.LENGTH_SHORT).show();
+                            });
+                } else {
+                    String fase = fases.get(position - 1);
+                    List<Float> emgFase = obtenerEMGFase(fase);
+                    return ResumenFaseFragment.newInstance(
+                            metricasPorFase.get(fase),
+                            analisisPorFase.get(fase),
+                            emgFase);
+                }
+            }
+        });
+
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) ->
+                tab.setText(position == 0 ? "General" : fases.get(position - 1))
+        ).attach();
+    }
+
+    // ===== HELPERS =====
+
+    private List<Float> obtenerEMGFase(String fase) {
+        if (!tieneCSVLocal) return null;
+        Map<String, List<Float>> emgPorFase = ReporteGenerator.leerEMGPorFase(
+                this, prueba.id, ejecucion.id);
+        return emgPorFase != null ? emgPorFase.get(fase) : null;
+    }
+
+    private float calcularROMMax(MusculoAnalyzer.ResultadoAnalisis r) {
+        float max = Float.NaN;
+        if (!Float.isNaN(r.romPitch)) max = r.romPitch;
+        if (!Float.isNaN(r.romRoll) && (Float.isNaN(max) || r.romRoll > max)) max = r.romRoll;
+        if (!Float.isNaN(r.romYaw)  && (Float.isNaN(max) || r.romYaw  > max)) max = r.romYaw;
+        return max;
+    }
+
+    private float getFloat(Map<String, ?> map, String key) {
+        Object val = map.get(key);
+        if (val instanceof Double) return ((Double) val).floatValue();
+        if (val instanceof Float)  return (Float) val;
+        return Float.NaN;
     }
 
     private void configurarHeader() {
@@ -83,52 +307,10 @@ public class ResumenHistorialActivity extends AppCompatActivity {
                         "  ·  " + ejecucion.totalMuestras + " muestras" + origen);
     }
 
-    private void construirTarjetasPorFase() {
-        LinearLayout container = findViewById(R.id.containerFases);
-
-        // Cargar EMG por fase desde CSV si existe
-        Map<String, List<Float>> emgPorFase = null;
-        if (tieneCSVLocal) {
-            emgPorFase = ReporteGenerator.leerEMGPorFase(
-                    this, prueba.id, ejecucion.id);
-        }
-
-        // Tarjeta de totales
-        agregarTarjeta(container, "Total general",
-                ejecucion.emgMAVTotal,
-                ejecucion.emgWLTotal,
-                ejecucion.emgOrderVTotal,
-                ejecucion.dynMAVTotal,
-                emgPorFase != null ? obtenerTodosEMG(emgPorFase) : null);
-
-        // Tarjetas por fase
-        if (ejecucion.metricasPorFase != null) {
-            for (Map.Entry<String, Map<String, Float>> entry
-                    : ejecucion.metricasPorFase.entrySet()) {
-
-                String fase          = entry.getKey();
-                Map<String, Float> m = entry.getValue();
-
-                List<Float> emgFase = (emgPorFase != null)
-                        ? emgPorFase.get(fase) : null;
-
-                agregarTarjeta(container, fase,
-                        getFloat(m, "emgMAV"),
-                        getFloat(m, "emgWL"),
-                        getFloat(m, "emgOrderV"),
-                        getFloat(m, "dynMAV"),
-                        emgFase);
-            }
-        }
-    }
-
-    // Exportar
-
     private void exportarPDFHistorial() {
         try {
             File archivo = ReporteGenerator.exportarPDFHistorial(
-                    this, prueba, ejecucion);  // sin emgPorFase
-
+                    this, prueba, ejecucion);
             Uri uri = FileProvider.getUriForFile(
                     this, getPackageName() + ".provider", archivo);
             Intent intent = new Intent(Intent.ACTION_SEND);
@@ -136,133 +318,35 @@ public class ResumenHistorialActivity extends AppCompatActivity {
             intent.putExtra(Intent.EXTRA_STREAM, uri);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             startActivity(Intent.createChooser(intent, "Compartir PDF"));
-
         } catch (Exception e) {
             Toast.makeText(this, "Error al generar PDF: " + e.getMessage(),
                     Toast.LENGTH_LONG).show();
         }
     }
 
-    private void agregarTarjeta(LinearLayout container,
-                                String titulo,
-                                float emgMAV, float emgWL,
-                                float emgOrderV, float dynMAV,
-                                List<Float> emgParaFFT) {
-
-        View tarjeta = LayoutInflater.from(this)
-                .inflate(R.layout.item_resumen_fase, container, false);
-
-        ((TextView) tarjeta.findViewById(R.id.tvNombreFase)).setText(titulo);
-
-        if (prueba.necesitaESP32()) {
-            ((TextView) tarjeta.findViewById(R.id.tvMAV))
-                    .setText(String.format(Locale.US, "%.4f", emgMAV));
-            ((TextView) tarjeta.findViewById(R.id.tvWL))
-                    .setText(String.format(Locale.US, "%.4f", emgWL));
-            ((TextView) tarjeta.findViewById(R.id.tvOrderV))
-                    .setText(String.format(Locale.US, "%.4f", emgOrderV));
-            ((TextView) tarjeta.findViewById(R.id.tvDynMAV))
-                    .setText(String.format(Locale.US, "%.4f", dynMAV));
-        } else {
-            tarjeta.findViewById(R.id.tvLabelEMG).setVisibility(View.GONE);
-            tarjeta.findViewById(R.id.layoutMetricasEMG).setVisibility(View.GONE);
-        }
-
-        // FFT — solo si hay datos locales y suficientes muestras
-        if (emgParaFFT != null && emgParaFFT.size() >= 1024) {
-            graficarFFT(tarjeta, emgParaFFT);
-        } else {
-            tarjeta.findViewById(R.id.tvLabelFFT).setVisibility(View.GONE);
-            tarjeta.findViewById(R.id.chartFFT).setVisibility(View.GONE);
-        }
-
-        container.addView(tarjeta);
-    }
-
-    private void graficarFFT(View tarjeta, List<Float> emgFase) {
-        EMGFrequencyAnalyzer analyzer = new EMGFrequencyAnalyzer(1024, SAMPLE_RATE);
-        double[] magnitudes = analyzer.computeMagnitudes(emgFase, 0);
-        if (magnitudes == null) return;
-
-        ArrayList<Entry> entries = new ArrayList<>();
-        int maxFreqIndex = Math.min(magnitudes.length, 250);
-        for (int i = 0; i < maxFreqIndex; i++) {
-            entries.add(new Entry(i, (float) magnitudes[i]));
-        }
-
-        LineDataSet dataSet = new LineDataSet(entries, "Espectro");
-        dataSet.setColor(Color.rgb(255, 87, 34));
-        dataSet.setDrawCircles(false);
-        dataSet.setDrawValues(false);
-        dataSet.setLineWidth(1.5f);
-        dataSet.setDrawFilled(true);
-        dataSet.setFillColor(Color.rgb(255, 87, 34));
-        dataSet.setFillAlpha(80);
-
-        LineChart chart = tarjeta.findViewById(R.id.chartFFT);
-        XAxis xAxis = chart.getXAxis();
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                return String.format("%.0f", value * (1000f / 1024f));
-            }
-        });
-
-        YAxis yAxis = chart.getAxisLeft();
-        yAxis.setAxisMinimum(0f);
-        chart.getAxisRight().setEnabled(false);
-        chart.getDescription().setEnabled(false);
-        chart.setTouchEnabled(true);
-        chart.setData(new LineData(dataSet));
-        chart.invalidate();
-    }
-
-    // Combina todas las fases en una sola lista para el total
-    private List<Float> obtenerTodosEMG(Map<String, List<Float>> emgPorFase) {
-        List<Float> todos = new ArrayList<>();
-        for (List<Float> fase : emgPorFase.values()) todos.addAll(fase);
-        return todos;
-    }
-
-    private float getFloat(Map<String, ?> map, String key) {
-        Object val = map.get(key);
-        if (val instanceof Double) return ((Double) val).floatValue();
-        if (val instanceof Float)  return (Float) val;
-        return 0f;
-    }
     private void descargarCSVSiDisponible() {
-        // Mostrar indicador de descarga
         Toast.makeText(this, "Descargando datos...", Toast.LENGTH_SHORT).show();
-
-        ReporteGenerator.descargarCSVDeStorage(
-                this,
-                prueba.id,
-                ejecucion.id,
+        ReporteGenerator.descargarCSVDeStorage(this, prueba.id, ejecucion.id,
                 new ReporteGenerator.OnDescargaListener() {
                     @Override
                     public void onExito(File archivo) {
                         tieneCSVLocal = true;
                         runOnUiThread(() -> {
-                            // Actualizar subtítulo para indicar que FFT está disponible
                             configurarHeader();
+                            calcularDesdeCSV();
+                            configurarTabs();
                             Toast.makeText(ResumenHistorialActivity.this,
                                     "Datos descargados — FFT disponible",
                                     Toast.LENGTH_SHORT).show();
                         });
                     }
-
                     @Override
                     public void onError(Exception e) {
                         android.util.Log.w("STORAGE",
-                                "CSV no disponible en Storage: " + e.getMessage());
-                        // Silencioso — simplemente no habrá FFT
+                                "CSV no disponible: " + e.getMessage());
                     }
-
                     @Override
-                    public void onProgreso(int porcentaje) {
-                        android.util.Log.d("STORAGE", "Descarga: " + porcentaje + "%");
-                    }
+                    public void onProgreso(int porcentaje) {}
                 });
     }
 }

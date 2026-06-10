@@ -12,43 +12,241 @@ public class MusculoAnalyzer {
 
 
     public static class ResultadoAnalisis {
-        // Agregar estos campos
-        public float orderV;
-        public float dynMav;
-        // Dominio del tiempo — EMG
+
+        // ===== EMG =====
         public float rms;
         public float mav;
         public float wl;
-        public float var;
-        public int   zc;   // Zero Crossings
-        public int   ssc;  // Slope Sign Changes
-
-        // Dominio de la frecuencia — EMG
         public float frecuenciaMediana;
-        public float frecuenciaMedia;
-        public float potenciaTotal;
-        public float ratioBandas;     // bajas / altas frecuencias
+        public float indiceFatigaEMG;      // pendiente de frec. mediana por ventanas
 
-        // Fatiga
-        public float indiceFatiga;        // pendiente de frecuencia mediana
-        public float tasaDecaimientoRMS;  // pendiente del RMS
-
-        // Dinamómetro
+        // ===== DINAMÓMETRO =====
         public float fuerzaMaxima;
-        public float fuerzaMinima;
-        public float fuerzaPromedio;
-        public float tiempoHastaPico;   // ms
-        public float rfd;               // Tasa de desarrollo de fuerza
-        public float impulso;           // área bajo curva fuerza-tiempo
-        public float coeficienteVariacion;
+        public float tiempoHastaPico;      // ms
+        public float rfd;                  // V/s
+        public float impulso;
 
-        // Combinados
-        public float eficienciaMusular; // fuerza / EMG RMS
-        public float onsetMusular;      // ms entre inicio EMG y pico fuerza
+        // ===== IMU =====
+        public float romPitch;             // grados
+        public float romRoll;              // grados
+        public float romYaw;               // grados
+        public float velocidadAngularMaxima;
+        public float velocidadAngularPromedio;
+        public float indiceFatigaMecanica; // pendiente de ωmax por ventanas
 
-        // Daniels
-        public int   danielsEstimado;
-        public int   danielsAsignado = -1; // -1 = no asignado aún
+        // ===== FUSIÓN =====
+        public float eficienciaMuscular;   // fuerzaMaxima / RMS
+        public float eficienciaMovimiento; // ROM / RMS  (ROM = máximo de romPitch/Roll/Yaw)
+        public float onsetEMGFuerza;       // ms
+        public float onsetEMGMovimiento;   // ms
+
+        // ===== DANIELS =====
+        public int danielsEstimado;
+        public int danielsAsignado = -1;
+
+        // ===== INTERNOS (para cálculos) =====
+        public float orderV;   // se mantiene para compatibilidad con código existente
+        public float dynMav;
+    }
+    public static ResultadoAnalisis analizar(List<Float> emg,
+                                             List<Float> dynamo,
+                                             List<Float> gyroX,
+                                             List<Float> gyroY,
+                                             List<Float> gyroZ,
+                                             List<Float> pitch,
+                                             List<Float> roll,
+                                             List<Float> yaw,
+                                             double[] magnitudesFFT) {
+        ResultadoAnalisis r = new ResultadoAnalisis();
+
+        List<Float> emgL    = filtrarNaN(emg);
+        List<Float> dynamoL = filtrarNaN(dynamo);
+        List<Float> pitchL  = filtrarNaN(pitch);
+        List<Float> rollL   = filtrarNaN(roll);
+        List<Float> yawL    = filtrarNaN(yaw);
+        List<Float> gxL     = filtrarNaN(gyroX);
+        List<Float> gyL     = filtrarNaN(gyroY);
+        List<Float> gzL     = filtrarNaN(gyroZ);
+
+        // ===== EMG =====
+        if (esValida(emgL)) {
+            r.mav    = calcularMAV(emgL);
+            r.wl     = calcularWL(emgL);
+            r.rms    = calcularRMS(emgL);
+            r.orderV = (float) Math.sqrt(calcularVarianza(emgL) + r.mav * r.mav);
+        } else {
+            r.mav = r.wl = r.rms = r.orderV = Float.NaN;
+        }
+
+        if (magnitudesFFT != null) {
+            r.frecuenciaMediana = calcularFrecuenciaMediana(magnitudesFFT);
+        } else {
+            r.frecuenciaMediana = Float.NaN;
+        }
+
+        if (esValida(emgL) && emgL.size() >= SAMPLE_RATE) {
+            r.indiceFatigaEMG = calcularIndiceFatiga(emgL);
+        } else {
+            r.indiceFatigaEMG = Float.NaN;
+        }
+
+        // ===== DINAMÓMETRO =====
+        if (esValida(dynamoL)) {
+            r.fuerzaMaxima   = calcularMax(dynamoL);
+            r.dynMav         = calcularMAV(dynamoL);
+            r.tiempoHastaPico = calcularTiempoHastaPico(dynamoL);
+            r.rfd            = calcularRFD(dynamoL);
+            r.impulso        = calcularImpulso(dynamoL);
+        } else {
+            r.fuerzaMaxima = r.tiempoHastaPico =
+                    r.rfd = r.impulso = r.dynMav = Float.NaN;
+        }
+
+        // ===== IMU — ROM =====
+        r.romPitch = esValida(pitchL) ? calcularROM(pitchL) : Float.NaN;
+        r.romRoll  = esValida(rollL)  ? calcularROM(rollL)  : Float.NaN;
+        r.romYaw   = esValida(yawL)   ? calcularROM(yawL)   : Float.NaN;
+
+        // ===== IMU — Velocidad angular (magnitud del vector ω) =====
+        if (esValida(gxL) && esValida(gyL) && esValida(gzL)) {
+            List<Float> magnitudOmega = calcularMagnitudOmega(gxL, gyL, gzL);
+            r.velocidadAngularMaxima   = calcularMax(magnitudOmega);
+            r.velocidadAngularPromedio = calcularMAV(magnitudOmega);
+
+            if (magnitudOmega.size() >= SAMPLE_RATE) {
+                r.indiceFatigaMecanica = calcularIndiceFatigaMecanica(magnitudOmega);
+            } else {
+                r.indiceFatigaMecanica = Float.NaN;
+            }
+        } else {
+            r.velocidadAngularMaxima   = Float.NaN;
+            r.velocidadAngularPromedio = Float.NaN;
+            r.indiceFatigaMecanica     = Float.NaN;
+        }
+
+        // ===== FUSIÓN =====
+        // Eficiencia muscular: fuerzaMaxima / RMS
+        r.eficienciaMuscular = (!Float.isNaN(r.fuerzaMaxima) && !Float.isNaN(r.rms) && r.rms > 0)
+                ? r.fuerzaMaxima / r.rms : Float.NaN;
+
+        // Eficiencia de movimiento: ROM_max / RMS
+        float romMax = calcularROMMax(r.romPitch, r.romRoll, r.romYaw);
+        r.eficienciaMovimiento = (!Float.isNaN(romMax) && !Float.isNaN(r.rms) && r.rms > 0)
+                ? romMax / r.rms : Float.NaN;
+
+        // Onset EMG → Fuerza
+        r.onsetEMGFuerza = (esValida(emgL) && esValida(dynamoL))
+                ? calcularOnsetEMGFuerza(emgL, dynamoL) : Float.NaN;
+
+        // Onset EMG → Movimiento
+        List<Float> omegaParaOnset = (esValida(gxL) && esValida(gyL) && esValida(gzL))
+                ? calcularMagnitudOmega(gxL, gyL, gzL) : null;
+        r.onsetEMGMovimiento = (esValida(emgL) && omegaParaOnset != null)
+                ? calcularOnsetEMGMovimiento(emgL, omegaParaOnset) : Float.NaN;
+
+        r.danielsEstimado = estimarDaniels(r);
+
+        return r;
+    }
+    // ROM — diferencia entre máximo y mínimo del ángulo
+    public static float calcularROM(List<Float> angulos) {
+        if (angulos.size() < 2) return Float.NaN;
+        float max = calcularMax(angulos);
+        float min = calcularMin(angulos);
+        return Math.abs(max - min);
+    }
+
+    // Magnitud del vector velocidad angular: √(gx² + gy² + gz²)
+    public static List<Float> calcularMagnitudOmega(List<Float> gx,
+                                                    List<Float> gy,
+                                                    List<Float> gz) {
+        List<Float> magnitud = new ArrayList<>();
+        int n = Math.min(gx.size(), Math.min(gy.size(), gz.size()));
+        for (int i = 0; i < n; i++) {
+            float m = (float) Math.sqrt(
+                    gx.get(i) * gx.get(i) +
+                            gy.get(i) * gy.get(i) +
+                            gz.get(i) * gz.get(i));
+            magnitud.add(m);
+        }
+        return magnitud;
+    }
+
+    // Índice de fatiga mecánica — pendiente de ωmax por ventanas de 1s
+    public static float calcularIndiceFatigaMecanica(List<Float> omega) {
+        int ventana = SAMPLE_RATE;
+        int numVentanas = omega.size() / ventana;
+        if (numVentanas < 2) return Float.NaN;
+
+        List<Float> maxPorVentana = new ArrayList<>();
+        for (int i = 0; i < numVentanas; i++) {
+            List<Float> seg = omega.subList(i * ventana,
+                    Math.min((i + 1) * ventana, omega.size()));
+            maxPorVentana.add(calcularMax(new ArrayList<>(seg)));
+        }
+        return calcularPendiente(maxPorVentana);
+    }
+
+    // ROM máximo entre los tres ejes
+    private static float calcularROMMax(float romPitch, float romRoll, float romYaw) {
+        float max = Float.NaN;
+        if (!Float.isNaN(romPitch)) max = romPitch;
+        if (!Float.isNaN(romRoll)  && (Float.isNaN(max) || romRoll  > max)) max = romRoll;
+        if (!Float.isNaN(romYaw)   && (Float.isNaN(max) || romYaw   > max)) max = romYaw;
+        return max;
+    }
+
+    // Onset EMG → Fuerza
+    public static float calcularOnsetEMGFuerza(List<Float> emg, List<Float> dynamo) {
+        float lineaBase = calcularRMS(new ArrayList<>(
+                emg.subList(0, Math.min(100, emg.size()))));
+        float umbralEMG = lineaBase * 3f;
+
+        int onsetEMG = -1;
+        for (int i = 0; i < emg.size(); i++) {
+            if (Math.abs(emg.get(i)) > umbralEMG) { onsetEMG = i; break; }
+        }
+        if (onsetEMG < 0) return Float.NaN;
+
+        // Pico de fuerza
+        float max = calcularMax(dynamo);
+        int indicePico = -1;
+        for (int i = 0; i < dynamo.size(); i++) {
+            if (dynamo.get(i) >= max) { indicePico = i; break; }
+        }
+        if (indicePico < 0) return Float.NaN;
+
+        return Math.max(0, indicePico - onsetEMG); // ms
+    }
+
+    // Onset EMG → Movimiento
+    public static float calcularOnsetEMGMovimiento(List<Float> emg,
+                                                   List<Float> omega) {
+        float lineaBase = calcularRMS(new ArrayList<>(
+                emg.subList(0, Math.min(100, emg.size()))));
+        float umbralEMG = lineaBase * 3f;
+
+        int onsetEMG = -1;
+        for (int i = 0; i < emg.size(); i++) {
+            if (Math.abs(emg.get(i)) > umbralEMG) { onsetEMG = i; break; }
+        }
+        if (onsetEMG < 0) return Float.NaN;
+
+        // Inicio de movimiento: ω > 5°/s sostenido 50ms (50 muestras)
+        float umbralOmega = 5f;
+        int ventanaSostenida = 50;
+        int onsetMovimiento = -1;
+
+        for (int i = 0; i < omega.size() - ventanaSostenida; i++) {
+            boolean sostenido = true;
+            for (int j = i; j < i + ventanaSostenida; j++) {
+                if (omega.get(j) < umbralOmega) { sostenido = false; break; }
+            }
+            if (sostenido) { onsetMovimiento = i; break; }
+        }
+        if (onsetMovimiento < 0) return Float.NaN;
+
+        return Math.max(0, onsetMovimiento - onsetEMG); // ms
     }
     private static List<Float> filtrarNaN(List<Float> signal) {
         if (signal == null) return new ArrayList<>();
@@ -64,7 +262,7 @@ public class MusculoAnalyzer {
     }
     // ================= MÉTODO PRINCIPAL =================
 
-    public static ResultadoAnalisis analizar(List<Float> emg,
+    /*public static ResultadoAnalisis analizar(List<Float> emg,
                                              List<Float> dynamo,
                                              double[] magnitudesFFT) {
         ResultadoAnalisis r = new ResultadoAnalisis();
@@ -130,7 +328,7 @@ public class MusculoAnalyzer {
         r.danielsEstimado = estimarDaniels(r);
 
         return r;
-    }
+    }*/
 
     // ================= DOMINIO DEL TIEMPO =================
 

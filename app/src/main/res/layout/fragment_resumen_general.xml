@@ -26,18 +26,27 @@
                 android:padding="16dp">
 
                 <TextView
-                    android:text="Métricas básicas"
+                    android:text="EMG"
                     android:textSize="15sp"
                     android:textStyle="bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"/>
-
                 <LinearLayout
+                    android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="8dp">
+                    android:padding="16dp">
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical">
+                        <TextView android:text="RMS" android:textSize="11sp"
+                            android:textColor="@color/text_secondary" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                        <TextView android:id="@+id/tvRMS" android:textSize="13sp"
+                            android:textStyle="bold" android:fontFamily="monospace"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    </LinearLayout>
 
                     <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:orientation="vertical">
@@ -59,28 +68,208 @@
                             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     </LinearLayout>
 
+                </LinearLayout>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical">
+                    <TextView android:text="Frec. Mediana" android:textSize="11sp"
+                        android:textColor="@color/text_secondary" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                    <TextView android:id="@+id/tvFrecMediana" android:textSize="13sp"
+                        android:textStyle="bold" android:fontFamily="monospace"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                    android:layout_weight="1" android:orientation="vertical">
+                    <TextView android:text="Índ. fatiga" android:textSize="11sp"
+                        android:textColor="@color/text_secondary" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                    <TextView android:id="@+id/tvIndiceFatiga" android:textSize="13sp"
+                        android:textStyle="bold" android:fontFamily="monospace"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Dinamometro -->
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:text="Dinamometro"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"/>
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp">
+
                     <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:orientation="vertical">
-                        <TextView android:text="OrderV" android:textSize="11sp"
+                        <TextView android:text="Fuerza máx." android:textSize="11sp"
                             android:textColor="@color/text_secondary" android:layout_width="wrap_content"
                             android:layout_height="wrap_content"/>
-                        <TextView android:id="@+id/tvOrderV" android:textSize="13sp"
+                        <TextView android:id="@+id/tvFuerzaMax" android:textSize="13sp"
                             android:textStyle="bold" android:fontFamily="monospace"
                             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     </LinearLayout>
 
                     <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:orientation="vertical">
-                        <TextView android:text="MAV Dinamo" android:textSize="11sp"
+                        <TextView android:text="T. Pico (ms)" android:textSize="11sp"
                             android:textColor="@color/text_secondary" android:layout_width="wrap_content"
                             android:layout_height="wrap_content"/>
-                        <TextView android:id="@+id/tvDynMAV" android:textSize="13sp"
+                        <TextView android:id="@+id/tvTiempoPico" android:textSize="13sp"
+                            android:textStyle="bold" android:fontFamily="monospace"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical">
+                        <TextView android:text="RFD (V/s)" android:textSize="11sp"
+                            android:textColor="@color/text_secondary" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                        <TextView android:id="@+id/tvRFD" android:textSize="13sp"
+                            android:textStyle="bold" android:fontFamily="monospace"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical">
+                        <TextView android:text="Impulso" android:textSize="11sp"
+                            android:textColor="@color/text_secondary" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                        <TextView android:id="@+id/tvImpulso" android:textSize="13sp"
                             android:textStyle="bold" android:fontFamily="monospace"
                             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     </LinearLayout>
 
                 </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
+        <!-- IMU -->
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:text="IMU (Watch)"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"/>
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp">
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical">
+                        <TextView android:text="ROM Pitch" android:textSize="11sp"
+                            android:textColor="@color/text_secondary" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                        <TextView android:id="@+id/tvRomPitch" android:textSize="13sp"
+                            android:textStyle="bold" android:fontFamily="monospace"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical">
+                        <TextView android:text="ROM Roll" android:textSize="11sp"
+                            android:textColor="@color/text_secondary" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                        <TextView android:id="@+id/tvRomRoll" android:textSize="13sp"
+                            android:textStyle="bold" android:fontFamily="monospace"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical">
+                        <TextView android:text="ROM Yaw" android:textSize="11sp"
+                            android:textColor="@color/text_secondary" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                        <TextView android:id="@+id/tvRomYaw" android:textSize="13sp"
+                            android:textStyle="bold" android:fontFamily="monospace"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp">
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical">
+                        <TextView android:text="wMax" android:textSize="11sp"
+                            android:textColor="@color/text_secondary" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                        <TextView android:id="@+id/tvOmegaMax" android:textSize="13sp"
+                            android:textStyle="bold" android:fontFamily="monospace"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical">
+                        <TextView android:text="wPromedio" android:textSize="11sp"
+                            android:textColor="@color/text_secondary" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                        <TextView android:id="@+id/tvOmegaProm" android:textSize="13sp"
+                            android:textStyle="bold" android:fontFamily="monospace"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    </LinearLayout>
+
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:orientation="vertical">
+                        <TextView android:text="Fatiga Mecanica" android:textSize="11sp"
+                            android:textColor="@color/text_secondary" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                        <TextView android:id="@+id/tvFatigaMec" android:textSize="13sp"
+                            android:textStyle="bold" android:fontFamily="monospace"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    </LinearLayout>
+
+                </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -100,7 +289,7 @@
                 android:padding="16dp">
 
                 <TextView
-                    android:text="Análisis muscular"
+                    android:text="Fusión"
                     android:textSize="15sp"
                     android:textStyle="bold"
                     android:layout_width="wrap_content"
@@ -112,42 +301,24 @@
                     android:layout_height="wrap_content" android:orientation="horizontal"
                     android:layout_marginBottom="8dp">
 
+
+
                     <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:orientation="vertical">
-                        <TextView android:text="RMS" android:textSize="11sp"
+                        <TextView android:text="Efic. Muscular" android:textSize="11sp"
                             android:textColor="@color/text_secondary" android:layout_width="wrap_content"
                             android:layout_height="wrap_content"/>
-                        <TextView android:id="@+id/tvRMS" android:textSize="13sp"
+                        <TextView android:id="@+id/tvEficMuscular" android:textSize="13sp"
                             android:textStyle="bold" android:fontFamily="monospace"
                             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     </LinearLayout>
 
                     <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:orientation="vertical">
-                        <TextView android:text="Varianza" android:textSize="11sp"
+                        <TextView android:text="Efic. Movimiento" android:textSize="11sp"
                             android:textColor="@color/text_secondary" android:layout_width="wrap_content"
                             android:layout_height="wrap_content"/>
-                        <TextView android:id="@+id/tvVar" android:textSize="13sp"
-                            android:textStyle="bold" android:fontFamily="monospace"
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                    </LinearLayout>
-
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:orientation="vertical">
-                        <TextView android:text="ZC" android:textSize="11sp"
-                            android:textColor="@color/text_secondary" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-                        <TextView android:id="@+id/tvZC" android:textSize="13sp"
-                            android:textStyle="bold" android:fontFamily="monospace"
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                    </LinearLayout>
-
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:orientation="vertical">
-                        <TextView android:text="SSC" android:textSize="11sp"
-                            android:textColor="@color/text_secondary" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-                        <TextView android:id="@+id/tvSSC" android:textSize="13sp"
+                        <TextView android:id="@+id/tvEficMov" android:textSize="13sp"
                             android:textStyle="bold" android:fontFamily="monospace"
                             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     </LinearLayout>
@@ -161,133 +332,20 @@
 
                     <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:orientation="vertical">
-                        <TextView android:text="Frec. Mediana" android:textSize="11sp"
+                        <TextView android:text="Onset Fuerza" android:textSize="11sp"
                             android:textColor="@color/text_secondary" android:layout_width="wrap_content"
                             android:layout_height="wrap_content"/>
-                        <TextView android:id="@+id/tvFrecMediana" android:textSize="13sp"
+                        <TextView android:id="@+id/tvOnsetFuerza" android:textSize="13sp"
                             android:textStyle="bold" android:fontFamily="monospace"
                             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     </LinearLayout>
 
                     <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
                         android:layout_weight="1" android:orientation="vertical">
-                        <TextView android:text="Frec. Media" android:textSize="11sp"
+                        <TextView android:text="Onset Movimiento" android:textSize="11sp"
                             android:textColor="@color/text_secondary" android:layout_width="wrap_content"
                             android:layout_height="wrap_content"/>
-                        <TextView android:id="@+id/tvFrecMedia" android:textSize="13sp"
-                            android:textStyle="bold" android:fontFamily="monospace"
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                    </LinearLayout>
-
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:orientation="vertical">
-                        <TextView android:text="Potencia" android:textSize="11sp"
-                            android:textColor="@color/text_secondary" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-                        <TextView android:id="@+id/tvPotencia" android:textSize="13sp"
-                            android:textStyle="bold" android:fontFamily="monospace"
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                    </LinearLayout>
-
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:orientation="vertical">
-                        <TextView android:text="Ratio bandas" android:textSize="11sp"
-                            android:textColor="@color/text_secondary" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-                        <TextView android:id="@+id/tvRatioBandas" android:textSize="13sp"
-                            android:textStyle="bold" android:fontFamily="monospace"
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <!-- Fila 3 -->
-                <LinearLayout android:layout_width="match_parent"
-                    android:layout_height="wrap_content" android:orientation="horizontal"
-                    android:layout_marginBottom="8dp">
-
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:orientation="vertical">
-                        <TextView android:text="Fuerza máx." android:textSize="11sp"
-                            android:textColor="@color/text_secondary" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-                        <TextView android:id="@+id/tvFuerzaMax" android:textSize="13sp"
-                            android:textStyle="bold" android:fontFamily="monospace"
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                    </LinearLayout>
-
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:orientation="vertical">
-                        <TextView android:text="RFD (V/s)" android:textSize="11sp"
-                            android:textColor="@color/text_secondary" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-                        <TextView android:id="@+id/tvRFD" android:textSize="13sp"
-                            android:textStyle="bold" android:fontFamily="monospace"
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                    </LinearLayout>
-
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:orientation="vertical">
-                        <TextView android:text="T. Pico (ms)" android:textSize="11sp"
-                            android:textColor="@color/text_secondary" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-                        <TextView android:id="@+id/tvTiempoPico" android:textSize="13sp"
-                            android:textStyle="bold" android:fontFamily="monospace"
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                    </LinearLayout>
-
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:orientation="vertical">
-                        <TextView android:text="Impulso" android:textSize="11sp"
-                            android:textColor="@color/text_secondary" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-                        <TextView android:id="@+id/tvImpulso" android:textSize="13sp"
-                            android:textStyle="bold" android:fontFamily="monospace"
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <!-- Fila 4 -->
-                <LinearLayout android:layout_width="match_parent"
-                    android:layout_height="wrap_content" android:orientation="horizontal">
-
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:orientation="vertical">
-                        <TextView android:text="Eficiencia" android:textSize="11sp"
-                            android:textColor="@color/text_secondary" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-                        <TextView android:id="@+id/tvEficiencia" android:textSize="13sp"
-                            android:textStyle="bold" android:fontFamily="monospace"
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                    </LinearLayout>
-
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:orientation="vertical">
-                        <TextView android:text="Onset (ms)" android:textSize="11sp"
-                            android:textColor="@color/text_secondary" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-                        <TextView android:id="@+id/tvOnset" android:textSize="13sp"
-                            android:textStyle="bold" android:fontFamily="monospace"
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                    </LinearLayout>
-
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:orientation="vertical">
-                        <TextView android:text="Índ. fatiga" android:textSize="11sp"
-                            android:textColor="@color/text_secondary" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-                        <TextView android:id="@+id/tvIndiceFatiga" android:textSize="13sp"
-                            android:textStyle="bold" android:fontFamily="monospace"
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                    </LinearLayout>
-
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content"
-                        android:layout_weight="1" android:orientation="vertical">
-                        <TextView android:text="CV (%)" android:textSize="11sp"
-                            android:textColor="@color/text_secondary" android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-                        <TextView android:id="@+id/tvCV" android:textSize="13sp"
+                        <TextView android:id="@+id/tvOnsetMov" android:textSize="13sp"
                             android:textStyle="bold" android:fontFamily="monospace"
                             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     </LinearLayout>

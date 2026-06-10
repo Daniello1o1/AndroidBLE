@@ -63,14 +63,32 @@ public class ResumenFaseFragment extends Fragment {
         }
 
         if (analisis != null) {
-            setText(v, R.id.tvRMS,         "%.4f",   analisis.rms);
-            setText(v, R.id.tvFrecMediana, "%.1f Hz", analisis.frecuenciaMediana);
-            setText(v, R.id.tvRFD,         "%.2f",   analisis.rfd);
-            setText(v, R.id.tvFuerzaMax,   "%.4f V", analisis.fuerzaMaxima);
-            setText(v, R.id.tvIndiceFatiga,"%.4f",   analisis.indiceFatiga);
-            setText(v, R.id.tvEficiencia,  "%.4f",   analisis.eficienciaMusular);
-            setText(v, R.id.tvCV,          "%.1f%%", analisis.coeficienteVariacion);
+            // EMG
+            setText(v, R.id.tvRMS,          "%.4f",    analisis.rms);
+            setText(v, R.id.tvFrecMediana,  "%.1f Hz", analisis.frecuenciaMediana);
+            setText(v, R.id.tvIndiceFatiga, "%.4f",    analisis.indiceFatigaEMG);
 
+            // Dinamómetro
+            setText(v, R.id.tvFuerzaMax,    "%.4f V",  analisis.fuerzaMaxima);
+            setText(v, R.id.tvRFD,          "%.2f V/s", analisis.rfd);
+            setText(v, R.id.tvTiempoPico,   "%.0f ms", analisis.tiempoHastaPico);
+            setText(v, R.id.tvImpulso,      "%.4f",    analisis.impulso);
+
+            // IMU
+            setText(v, R.id.tvRomPitch,     "%.1f°",   analisis.romPitch);
+            setText(v, R.id.tvRomRoll,      "%.1f°",   analisis.romRoll);
+            setText(v, R.id.tvRomYaw,       "%.1f°",   analisis.romYaw);
+            setText(v, R.id.tvOmegaMax,     "%.1f °/s", analisis.velocidadAngularMaxima);
+            setText(v, R.id.tvOmegaProm,    "%.1f °/s", analisis.velocidadAngularPromedio);
+            setText(v, R.id.tvFatigaMec,    "%.4f",    analisis.indiceFatigaMecanica);
+
+            // Fusión
+            setText(v, R.id.tvEficiencia,   "%.4f",    analisis.eficienciaMuscular);
+            setText(v, R.id.tvEficMov,      "%.4f",    analisis.eficienciaMovimiento);
+            setText(v, R.id.tvOnsetFuerza,  "%.0f ms", analisis.onsetEMGFuerza);
+            setText(v, R.id.tvOnsetMov,     "%.0f ms", analisis.onsetEMGMovimiento);
+
+            // Daniels
             TextView tvDaniels = v.findViewById(R.id.tvDaniels);
             if (tvDaniels != null)
                 tvDaniels.setText(String.valueOf(analisis.danielsEstimado));

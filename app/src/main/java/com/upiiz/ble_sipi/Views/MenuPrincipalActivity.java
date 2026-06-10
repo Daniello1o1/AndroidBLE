@@ -25,6 +25,7 @@ import com.upiiz.ble_sipi.Tools.ReporteGenerator;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class MenuPrincipalActivity extends AppCompatActivity {
@@ -86,23 +87,65 @@ public class MenuPrincipalActivity extends AppCompatActivity {
                     List<Ejecucion> lista = new ArrayList<>();
                     for (DocumentSnapshot doc : snapshot.getDocuments()) {
                         Ejecucion e = new Ejecucion();
-                        e.id                = doc.getId();
-                        e.danielsAsignado   = toInt(doc.get("danielsAsignado"));
-                        e.danielsEstimado   = toInt(doc.get("danielsEstimado"));
-                        e.rms               = toFloat(doc.get("rms"));
-                        e.emgMAVTotal       = toFloat(doc.get("emgMAVTotal"));
-                        e.emgWLTotal        = toFloat(doc.get("emgWLTotal"));
-                        e.emgOrderVTotal    = toFloat(doc.get("emgOrderVTotal"));
-                        e.frecuenciaMediana = toFloat(doc.get("frecuenciaMediana"));
-                        e.frecuenciaMedia   = toFloat(doc.get("frecuenciaMedia"));
-                        e.rfd               = toFloat(doc.get("rfd"));
-                        e.fuerzaMaxima      = toFloat(doc.get("fuerzaMaxima"));
-                        e.impulso           = toFloat(doc.get("impulso"));
-                        e.indiceFatiga      = toFloat(doc.get("indiceFatiga"));
-                        e.eficienciaMusular = toFloat(doc.get("eficienciaMusular"));
+                        e.id                       = doc.getId();
+                        e.pacienteId               = doc.getString("pacienteId");
+                        e.pruebaId                 = doc.getString("pruebaId");
+                        e.totalMuestras            = toInt(doc.get("totalMuestras"));
+                        e.duracionReal             = toInt(doc.get("duracionReal"));
+                        e.fechaEjecucion           = toLong(doc.get("fechaEjecucion"));
+
+                        // EMG
+                        e.rms                      = toFloat(doc.get("rms"));
+                        e.mav                      = toFloat(doc.get("mav"));
+                        e.wl                       = toFloat(doc.get("wl"));
+                        e.frecuenciaMediana        = toFloat(doc.get("frecuenciaMediana"));
+                        e.indiceFatigaEMG          = toFloat(doc.get("indiceFatigaEMG"));
+
+                        // Dinamómetro
+                        e.fuerzaMaxima             = toFloat(doc.get("fuerzaMaxima"));
+                        e.tiempoHastaPico          = toFloat(doc.get("tiempoHastaPico"));
+                        e.rfd                      = toFloat(doc.get("rfd"));
+                        e.impulso                  = toFloat(doc.get("impulso"));
+
+                        // IMU
+                        e.romPitch                 = toFloat(doc.get("romPitch"));
+                        e.romRoll                  = toFloat(doc.get("romRoll"));
+                        e.romYaw                   = toFloat(doc.get("romYaw"));
+                        e.velocidadAngularMaxima   = toFloat(doc.get("velocidadAngularMaxima"));
+                        e.velocidadAngularPromedio = toFloat(doc.get("velocidadAngularPromedio"));
+                        e.indiceFatigaMecanica     = toFloat(doc.get("indiceFatigaMecanica"));
+
+                        // Fusión
+                        e.eficienciaMuscular       = toFloat(doc.get("eficienciaMuscular"));
+                        e.eficienciaMovimiento     = toFloat(doc.get("eficienciaMovimiento"));
+                        e.onsetEMGFuerza           = toFloat(doc.get("onsetEMGFuerza"));
+                        e.onsetEMGMovimiento       = toFloat(doc.get("onsetEMGMovimiento"));
+
+                        // Daniels
+                        e.danielsEstimado          = toInt(doc.get("danielsEstimado"));
+                        e.danielsAsignado          = toInt(doc.get("danielsAsignado"));
+
+                        // Básicas (compatibilidad)
+                        e.emgMAVTotal              = toFloat(doc.get("emgMAVTotal"));
+                        e.emgWLTotal               = toFloat(doc.get("emgWLTotal"));
+                        e.emgOrderVTotal           = toFloat(doc.get("emgOrderVTotal"));
+                        e.dynMAVTotal              = toFloat(doc.get("dynMAVTotal"));
+
+                        // Métricas por fase
+                        Object metricasObj = doc.get("metricasPorFase");
+                        if (metricasObj instanceof Map) {
+                            //noinspection unchecked
+                            e.metricasPorFase = (Map<String, Map<String, Float>>) metricasObj;
+                        }
+
                         lista.add(e);
                     }
                     runOnUiThread(() -> callback.accept(lista));
+                })
+                .addOnSuccessListener(snapshot -> {
+                    android.util.Log.d("CSV_GLOBAL",
+                            "Ejecuciones encontradas: " + snapshot.size());
+                    // ...
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Error cargando ejecuciones: "
@@ -112,9 +155,11 @@ public class MenuPrincipalActivity extends AppCompatActivity {
     }
 
     private float toFloat(Object o) {
-        if (o instanceof Double) return ((Double) o).floatValue();
-        if (o instanceof Float)  return (Float) o;
-        return 0f;
+        if (o instanceof Double)  return ((Double) o).floatValue();
+        if (o instanceof Float)   return (Float) o;
+        if (o instanceof Long)    return ((Long) o).floatValue();
+        if (o instanceof Integer) return ((Integer) o).floatValue();
+        return Float.NaN;
     }
 
     private int toInt(Object o) {
@@ -122,6 +167,13 @@ public class MenuPrincipalActivity extends AppCompatActivity {
         if (o instanceof Integer) return (Integer) o;
         return -1;
     }
+
+    private long toLong(Object o) {
+        if (o instanceof Long)    return (Long) o;
+        if (o instanceof Integer) return ((Integer) o).longValue();
+        return 0L;
+    }
+
     private void exportarDatasetCompleto() {
         btnExportarDataset.setEnabled(false);
         btnExportarDataset.setText("Preparando dataset...");
