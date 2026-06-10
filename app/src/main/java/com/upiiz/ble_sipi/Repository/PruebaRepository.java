@@ -160,6 +160,12 @@ public class PruebaRepository {
 
     private Map<String, Object> ejecucionToMap(Ejecucion e) {
         Map<String, Object> map = new HashMap<>();
+        map.put("duracionReal",   e.duracionReal);
+        map.put("totalMuestras",  e.totalMuestras);
+        map.put("pacienteId",     e.pacienteId);
+        map.put("fechaEjecucion", e.fechaEjecucion != 0
+                ? e.fechaEjecucion
+                : System.currentTimeMillis());
         // EMG
         map.put("rms",                  e.rms);
         map.put("mav",                  e.mav);
@@ -204,7 +210,16 @@ public class PruebaRepository {
 
     @SuppressWarnings("unchecked")
     private Ejecucion mapToEjecucion(String id, Map<String, Object> map) {
+        // Log temporal para ver qué campos existen
+        android.util.Log.d("EJECUCION_MAP", "Campos en doc " + id + ": " + map.keySet().toString());
+        android.util.Log.d("EJECUCION_MAP", "duracionReal=" + map.get("duracionReal")
+                + " totalMuestras=" + map.get("totalMuestras"));
         Ejecucion e = new Ejecucion();
+        e.id = id;
+        e.pacienteId    = (String) map.get("pacienteId");
+        e.fechaEjecucion = toLong(map.get("fechaEjecucion"));
+        e.duracionReal  = toInt(map.get("duracionReal"));    // ← agregar
+        e.totalMuestras = toInt(map.get("totalMuestras"));
         e.rms                    = toFloat(map.get("rms"));
         e.mav                    = toFloat(map.get("mav"));
         e.wl                     = toFloat(map.get("wl"));
@@ -282,4 +297,5 @@ public class PruebaRepository {
         if (o instanceof Boolean) return (Boolean) o;
         return false;
     }
+
 }

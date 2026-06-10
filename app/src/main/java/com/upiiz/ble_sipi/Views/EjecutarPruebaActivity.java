@@ -59,9 +59,10 @@ public class EjecutarPruebaActivity extends AppCompatActivity {
     private int segundosTotalRestantes = 0;
 
     // Último dato del Watch
-    private float lastAccX, lastAccY, lastAccZ;
-    private float lastGyroX, lastGyroY, lastGyroZ;
-    private float lastPitch, lastRoll, lastYaw;
+
+    private volatile float lastAccX = Float.NaN, lastAccY = Float.NaN, lastAccZ = Float.NaN;
+    private volatile float lastGyroX = Float.NaN, lastGyroY = Float.NaN, lastGyroZ = Float.NaN;
+    private volatile float lastPitch = Float.NaN, lastRoll = Float.NaN, lastYaw = Float.NaN;
     private long lastWatchTimestamp = 0;
 
     // Handlers
@@ -299,9 +300,25 @@ public class EjecutarPruebaActivity extends AppCompatActivity {
                     // Si la prueba no usa ESP32, guardar muestra desde el Watch
                     if (!config.necesitaESP32()) {
                         MuestraDato m = new MuestraDato(lastWatchTimestamp, getFaseActualNombre());
-                        m.accX = lastAccX; m.accY = lastAccY; m.accZ = lastAccZ;
-                        m.gyroX = lastGyroX; m.gyroY = lastGyroY; m.gyroZ = lastGyroZ;
-                        m.pitch = lastPitch; m.roll = lastRoll; m.yaw = lastYaw;
+
+                        // Contexto — igual que el hilo guardado
+                        m.pruebaId       = config.id;
+                        m.pruebaNombre   = config.nombre;
+                        m.pacienteId     = config.pacienteId;
+                        m.pacienteNombre = paciente != null ? paciente.getNombreCompleto() : "";
+                        m.pacienteEdad   = paciente != null ? paciente.edad : 0;
+                        m.pacienteSexo   = paciente != null ? paciente.sexo : "";
+
+                        if (config.usarAcelerometro) {
+                            m.accX = lastAccX; m.accY = lastAccY; m.accZ = lastAccZ;
+                        }
+                        if (config.usarGiroscopio) {
+                            m.gyroX = lastGyroX; m.gyroY = lastGyroY; m.gyroZ = lastGyroZ;
+                        }
+                        if (config.usarOrientacion) {
+                            m.pitch = lastPitch; m.roll = lastRoll; m.yaw = lastYaw;
+                        }
+
                         synchronized (muestras) { muestras.add(m); }
                     }
 

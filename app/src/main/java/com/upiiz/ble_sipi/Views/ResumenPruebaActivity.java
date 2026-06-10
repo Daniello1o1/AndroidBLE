@@ -207,7 +207,11 @@ public class ResumenPruebaActivity extends AppCompatActivity {
                             metricasGlobales,
                             grado -> {
                                 danielsAsignadoFinal = grado;
-                                actualizarDanielsEnFirestore(grado);
+                                if (ejecucionIdGuardado != null) {
+                                    // Ya tenemos el ID — guardar ahora
+                                    actualizarDanielsEnFirestore(grado);
+                                }
+                                // Si no hay ID aún, se guardará en onSuccess de guardarEjecucionEnFirestore
                             });
                 } else {
                     String fase = fases.get(position - 1);
@@ -281,6 +285,7 @@ public class ResumenPruebaActivity extends AppCompatActivity {
         ejecucion.duracionReal    = config.duracionTotalSegundos;
         ejecucion.pacienteId      = config.pacienteId;
         ejecucion.totalMuestras   = muestras.size();
+        ejecucion.fechaEjecucion  = System.currentTimeMillis();
         ejecucion.emgMAVTotal     = metricasGlobales[0];
         ejecucion.emgWLTotal      = metricasGlobales[1];
         ejecucion.emgOrderVTotal  = metricasGlobales[2];
@@ -323,6 +328,11 @@ public class ResumenPruebaActivity extends AppCompatActivity {
                         ejecucionIdGuardado = id;
                         ejecucion.id = id;
                         for (MuestraDato m : muestras) m.ejecucionId = id;
+
+                        // Si el médico ya asignó Daniels antes de que terminara de guardar
+                        if (danielsAsignadoFinal >= 0) {
+                            actualizarDanielsEnFirestore(danielsAsignadoFinal);
+                        }
 
                         try {
                             ReporteGenerator.guardarCSVLocal(

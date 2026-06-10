@@ -206,7 +206,7 @@ public class BLEService extends Service {
                                             BluetoothGattCharacteristic characteristic) {
 
             // Al inicio del método
-            Log.d("BLE_TIMING", "Paquete recibido en: " + System.currentTimeMillis());
+            // Log.d("BLE_TIMING", "Paquete recibido en: " + System.currentTimeMillis());
             byte[] data = characteristic.getValue();
             if (data == null || data.length < 4) return;
 
@@ -223,7 +223,7 @@ public class BLEService extends Service {
             // Detectar pérdidas
             if (lastExpectedIndex != -1 && firstIndex != lastExpectedIndex) {
                 int lost = firstIndex - lastExpectedIndex;
-                Log.d("Package Losses: ", String.valueOf(lost));
+                //Log.d("Package Losses: ", String.valueOf(lost));
             }
             // Actualizar el próximo índice esperado
             lastExpectedIndex = firstIndex + samples;
@@ -248,7 +248,7 @@ public class BLEService extends Service {
             packetCount++;
             long now = System.currentTimeMillis();
             if (now - lastPacketLog >= 1000) {
-                Log.d("BLE_STATS", "Paquetes/s: " + packetCount + ", Muestras/s: " + (packetCount * samples));
+                //Log.d("BLE_STATS", "Paquetes/s: " + packetCount + ", Muestras/s: " + (packetCount * samples));
                 packetCount = 0;
                 lastPacketLog = now;
             }

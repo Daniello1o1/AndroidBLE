@@ -1130,8 +1130,13 @@ public class ReporteGenerator {
                                              String ejecucionId,
                                              OnDescargaListener listener) {
 
+        android.util.Log.d("STORAGE_DESCARGA",
+                "Buscando: pruebas/" + pruebaId + "/" + ejecucionId + ".csv.gz");
+
         File archivoLocal = new File(context.getFilesDir(),
                 pruebaId + "_" + ejecucionId + ".csv");
+
+
 
         // Si ya existe localmente no descargar
         if (archivoLocal.exists()) {
