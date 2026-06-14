@@ -21,6 +21,8 @@ public class MusculoAnalyzer {
         public float indiceFatigaEMG;      // pendiente de frec. mediana por ventanas
 
         // ===== DINAMÓMETRO =====
+
+
         public float fuerzaMaxima;
         public float tiempoHastaPico;      // ms
         public float rfd;                  // V/s
@@ -92,11 +94,16 @@ public class MusculoAnalyzer {
 
         // ===== DINAMÓMETRO =====
         if (esValida(dynamoL)) {
-            r.fuerzaMaxima   = calcularMax(dynamoL);
-            r.dynMav         = calcularMAV(dynamoL);
-            r.tiempoHastaPico = calcularTiempoHastaPico(dynamoL);
-            r.rfd            = calcularRFD(dynamoL);
-            r.impulso        = calcularImpulso(dynamoL);
+            List<Float> dynamoN = new ArrayList<>();
+            for (Float v : dynamoL) {
+                dynamoN.add(Float.isNaN(v) ? Float.NaN : (v / DYNAMO_MAX_VOLTAGE) * DYNAMO_MAX_NEWTONS);
+            }
+
+            r.dynMav               = calcularMAV(dynamoN);
+            r.fuerzaMaxima         = calcularMax(dynamoN);
+            r.tiempoHastaPico      = calcularTiempoHastaPico(dynamoN);
+            r.rfd                  = calcularRFD(dynamoN);
+            r.impulso              = calcularImpulso(dynamoN);
         } else {
             r.fuerzaMaxima = r.tiempoHastaPico =
                     r.rfd = r.impulso = r.dynMav = Float.NaN;
@@ -147,6 +154,13 @@ public class MusculoAnalyzer {
         r.danielsEstimado = estimarDaniels(r);
 
         return r;
+    }
+
+    private static final float DYNAMO_MAX_VOLTAGE = 3.3f;
+    private static final float DYNAMO_MAX_NEWTONS  = 600f;
+    public static float voltiosANewtons(float voltios) {
+        if (Float.isNaN(voltios)) return Float.NaN;
+        return (voltios / DYNAMO_MAX_VOLTAGE) * DYNAMO_MAX_NEWTONS;
     }
     // ROM — diferencia entre máximo y mínimo del ángulo
     public static float calcularROM(List<Float> angulos) {
