@@ -251,6 +251,7 @@ public class EjecutarPruebaActivity extends AppCompatActivity {
         if (!config.necesitaESP32()) return;
 
         Intent intent = new Intent(this, BLEService.class);
+        startService(intent);
         bindService(intent, bleConnection, BIND_AUTO_CREATE);
     }
 
@@ -261,7 +262,10 @@ public class EjecutarPruebaActivity extends AppCompatActivity {
             bleService = binder.getService();
             isBound = true;
 
+            android.util.Log.d("ESP32_DEBUG", "Service conectado, asignando listener");
+
             bleService.setListener((emg, dynamo) -> {
+                android.util.Log.d("ESP32_DEBUG", "Dato recibido: emg=" + emg + " dynamo=" + dynamo);
                 // Solo encolar — rapidísimo, no bloquea nada
                 colaRaw.offer(new float[]{emg, dynamo});
             });
@@ -269,6 +273,7 @@ public class EjecutarPruebaActivity extends AppCompatActivity {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
+            android.util.Log.w("ESP32_DEBUG", "Service desconectado");
             isBound = false;
         }
     };
@@ -490,7 +495,10 @@ public class EjecutarPruebaActivity extends AppCompatActivity {
                     // Espera hasta que llegue un dato — no consume CPU
                     float[] muestra = colaRaw.poll(100,
                             java.util.concurrent.TimeUnit.MILLISECONDS);
-                    if (muestra == null) continue;
+                    if (muestra == null){
+                        android.util.Log.d("ESP32_DEBUG", "Cola vacía, esperando...");
+                        continue;
+                    }
 
                     float emg    = muestra[0];
                     float dynamo = muestra[1];

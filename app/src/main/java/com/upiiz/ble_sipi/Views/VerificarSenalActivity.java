@@ -119,6 +119,7 @@ public class VerificarSenalActivity extends AppCompatActivity {
         // El servicio ya está corriendo desde la pantalla 3
         // Solo nos enlazamos para recibir los datos
         Intent intent = new Intent(this, BLEService.class);
+        startService(intent);
         bindService(intent, bleConnection, BIND_AUTO_CREATE);
     }
 
