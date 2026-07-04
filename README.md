@@ -1,7 +1,5 @@
 ## Abstract
-This is an app developed in Android Studio created which purpose is to create patients and orthopedic tests. The app can make a BLE connection to an ESP32 and to
-a smartwatch (which needs to be programmable in Android Studio and need to have a gyroscope and a acelerometer). This app is just a part of a full project to measure
-the arm muscle health. The ESP32 is intented to be connected to an EMG sensor and to a Dynamometer, this two signals are sending by the BLE connection. 
+This is an app developed in Android Studio which purpose is to create patients and orthopedic tests. The application can establish a BLE connection with an ESP32 and with a smartwatch (which needs to be programmable in Android Studio and need to have a gyroscope and a acelerometer). This app is just a part of a full project to measure the arm muscle health. The ESP32 is intented to be connected to an EMG sensor and to a Dynamometer, this two signals are sending by the BLE connection. 
 ## Installation
 1. Install Android Studio
 2. Click on "Get from VCS" and select "Git"
